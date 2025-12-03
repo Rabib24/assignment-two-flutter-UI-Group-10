@@ -1,0 +1,64 @@
+# MiniMart Flutter App - TODO List
+
+## COMPLETED TASKS
+[x] Set up Flutter project structure
+[x] Configure Firebase integration
+[x] Implement user authentication system (login, signup, forgot password)
+[x] Create product data model
+[x] Implement product categories (Fruits, Vegetables, Fish, Meat, Groceries)
+[x] Add product data with images and descriptions
+[x] Create splash screen
+[x] Implement main app navigation
+[x] Design shop page with product grid
+[x] Create product details page
+[x] Implement shopping cart functionality
+[x] Design cart page with item management
+[x] Create checkout page
+[x] Implement order confirmation page
+[x] Design orders history page
+[x] Create profile page
+[x] Implement location selector
+[x] Add custom app bar and drawer
+[x] Create custom bottom navigation bar
+[x] Implement state management with Provider
+[x] Add image caching for better performance
+[x] Configure app theme and colors
+[x] Add snackbar notifications
+[x] Set up app permissions
+[x] Implement product catalog load from Firebase (name, price, category, image URL)
+[x] Implement product details view with larger image, name, price, description, and add to cart
+[x] Implement cart screen with increase/decrease quantity, remove item, and auto-update totals
+[x] Implement order placement with customer details (name, phone, address)
+[x] Implement order confirmation screen with order status
+[x] Implement order ID generation using Firebase Document ID
+[x] Implement order history with view all placed orders, filter by status, and view order details
+[x] Implement checkout with save order summary in Firebase and clear cart
+
+## PENDING TASKS
+[ ] Add search functionality for products
+[ ] Implement product filtering and sorting options
+[ ] Add wishlist/favorites feature
+[ ] Implement push notifications for order updates
+[ ] Add payment gateway integration
+[ ] Implement user reviews and ratings for products
+[ ] Add product comparison feature
+[ ] Implement coupon/discount system
+[ ] Add multi-language support
+[ ] Implement dark mode toggle
+[ ] Add offline support with local data caching
+[ ] Implement admin panel for product management
+[ ] Add social sharing features
+[ ] Implement customer support chat
+[ ] Add barcode scanning for product search
+[ ] Implement delivery tracking system
+[ ] Add email/SMS notifications
+[ ] Implement user referral program
+[ ] Add analytics for user behavior tracking
+[ ] Optimize app performance and reduce loading times
+[ ] Write unit and widget tests
+[ ] Add accessibility features
+[ ] Implement app onboarding tutorial
+[ ] Add voice search functionality
+
+## QODER ASSISTANT TASKS
+[ ] Continue monitoring project progress and assist with implementation as needed
