@@ -1,0 +1,88 @@
+I'll provide you with step-by-step instructions to set up Git for your Flutter project and push your changes to your branch. Here's how to do it:
+
+## Step-by-Step Git Configuration
+
+### 1. Initialize Git in Your Local Project Folder
+
+First, navigate to your project directory and initialize a Git repository:
+
+```bash
+cd "c:\Users\rabib\Downloads\MobileAPpFinalProject\assignment-two-flutter-UI-Group-10-Sakib"
+git init
+```
+
+### 2. Connect to the Remote Repository
+
+Add the remote repository URL:
+
+```bash
+git remote add origin https://github.com/Rabib24/assignment-two-flutter-UI-Group-10.git
+```
+
+Verify that the remote has been added correctly:
+
+```bash
+git remote -v
+```
+
+### 3. Create and Switch to Your "Rabib" Branch
+
+Create and switch to your branch:
+
+```bash
+git checkout -b Rabib
+```
+
+### 4. Add, Commit, and Push Your Changes
+
+Add all your files to Git:
+
+```bash
+git add .
+```
+
+Commit your changes with a descriptive message:
+
+```bash
+git commit -m "Initial commit with Flutter project files and updates"
+```
+
+Push your changes to your branch on GitHub:
+
+```bash
+git push -u origin Rabib
+```
+
+## Additional Git Commands You Might Find Useful
+
+If you need to check the status of your repository at any time:
+
+```bash
+git status
+```
+
+To see the commit history:
+
+```bash
+git log --oneline
+```
+
+If you later make changes and want to push them:
+
+```bash
+git add .
+git commit -m "Description of your changes"
+git push origin Rabib
+```
+
+## Important Notes
+
+1. Make sure you have Git installed on your system
+2. The first time you push, you might be prompted for your GitHub username and password (or personal access token)
+3. If the remote branch already exists, you might need to pull first:
+   ```bash
+   git pull origin Sakib
+   ```
+4. If you encounter any merge conflicts, you'll need to resolve them before pushing
+
+These steps will successfully link your local Flutter project to the GitHub repository and push your updated code to your "Rabib" branch.

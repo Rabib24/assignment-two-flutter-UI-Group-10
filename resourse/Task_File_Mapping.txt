@@ -1,0 +1,131 @@
+# Detailed Code Mapping & Technical Reference - MiniMart [Analysis]
+
+This reference document provides a deep dive into the code structure, widget usage, and data flow patterns for the application's key files. It is designed to assist developers in understanding *how* specific features are implemented.
+
+---
+
+## 1. Authentication Module
+
+### `lib/auth/login_screen.dart`
+**Structure & Logic:**
+This file uses a `StatefulWidget` to manage form state (email and password controllers). The `build` method wraps the entire UI in a `Scaffold` and `SafeArea`. The core logic resides in the `_submit` method, which validates the form using a `GlobalKey<FormState>`. Upon validation, it calls `Provider.of<AuthProvider>(context, listen: false).login()`. It uses a `try-catch` block to handle `FirebaseAuthException` errors, displaying them via the `ScaffoldMessenger` (SnackBars).
+
+**Data Flow:**
+This is an entry point screen, so it receives little external data. However, it navigates to `SignupScreen` or `ForgotPasswordScreen` using `Navigator.of(context).pushNamed(...)`.
+
+**Widgets Used:**
+*   **`Form` / `TextFormField`:** Used for input validation. Requires `validator` callbacks (e.g., checking for '@' symbol).
+*   **`CustomTextField`:** (If implemented) A reusable wrapper for styling inputs.
+*   **`ElevatedButton`:** Triggers the login action.
+*   **`TextButton`:** Used for "Sign Up" and "Forgot Password" links.
+
+---
+
+## 2. Product Discovery & Navigation
+
+### `lib/main.dart`
+**Structure & Logic:**
+The root of the specific application. It sets up the `MultiProvider` to inject `AuthProvider`, `ProductsProvider`, `CartProvider`, etc., into the widget tree. The `MaterialApp` is configured here, defining the `theme` (Light/Dark mode) and the `home` widget. The `home` uses a `StreamBuilder` listening to `FirebaseAuth.instance.authStateChanges()` to decide whether to show the `ShopPage` (if logged in) or `LoginScreen` (if logged out).
+
+**Data Flow:**
+Acts as the root data injector. No data is passed *to* it, but it passes the `User` object downstream via the StreamBuilder.
+
+**Widgets Used:**
+*   **`MultiProvider`:** Essential for state management.
+*   **`StreamBuilder`:** Critical for handling real-time Auth state changes.
+*   **`MaterialApp`:** Sets global configuration like `debugShowCheckedModeBanner: false`.
+
+### `lib/screens/shop_page.dart`
+**Structure & Logic:**
+The main dashboard. It uses a `StatefulWidget` because it maintains local state for the Search Query (`_searchQuery`) and Sort Order (`_sortBy`). The `initState` utilizes a `Future.delayed` hack to fetch products (`fetchProducts`) without blocking the build. The UI uses a `CustomScrollView` with `Slivers` (like `SliverAppBar`, `SliverGrid`) to create a performant, scrolling layout that combines banners, horizontal lists, and grids.
+
+**Data Flow:**
+Does not receive arguments. It consumes data from `Provider.of<ProductsProvider>`. It passes product data *forward* to `ProductDetailsPage` via `Navigator.push`.
+
+**Widgets Used:**
+*   **`Consumer<ProductsProvider>`:** Listens to data changes to rebuild the UI.
+*   **`RefreshIndicator`:** Wraps the body to allow "Pull-to-Refresh" functionality.
+*   **`SliverGrid` / `SliverToBoxAdapter`:** Used for complex scrolling layouts.
+*   **`ProductGridItem`:** Custom widget used to render individual product cards.
+
+### `lib/screens/product_details_page.dart`
+**Structure & Logic:**
+A `StatelessWidget` that displays full details. It uses a `CustomScrollView` with a `SliverAppBar` to create a "Parallax Image" effect (the image collapses as you scroll up). The logic checks if the item is already in the cart (`cart.items.containsKey`) to toggle the button text between "Add to Cart" and "Remove from Cart".
+
+**Data Flow:**
+**Receiving Data:** It requires a `Product` object to be passed via its constructor (`final Product product;`).
+**Sending Data:** Connects to `CartProvider` to add the current product to the cart.
+
+**Widgets Used:**
+*   **`CachedNetworkImage`:** Loads images from URLs with offline caching. Parameters: `imageUrl`, `placeholder`, `errorWidget`.
+*   **`Hero`:** (Optional) Wraps the image widget to create a smooth transition animation from the previous screen.
+*   **`Consumer<CartProvider>`:** Used specifically around the "Add to Cart" button to rebuild *only* that button when cart state changes, optimizing performance.
+
+### `lib/widgets/product_grid_item.dart`
+**Structure & Logic:**
+A reusable component representing a single product card. It uses `GridTile` to overlay a footer (with price/title) on top of the image. The "Heart" icon uses a `Consumer<WishlistProvider>` to toggle the red favorite state immediately.
+
+**Data Flow:**
+Receives a `Product` object via constructor. Uses `GestureDetector` or `InkWell` to trigger navigation to `ProductDetailsPage` on tap.
+
+**Widgets Used:**
+*   **`GridTile`:** A standard widget great for grids. `footer`: sets the black bar at the bottom.
+*   **`GestureDetector`:** Handles the `onTap` event.
+
+---
+
+## 3. Cart & Checkout System
+
+### `lib/screens/cart_page.dart`
+**Structure & Logic:**
+Displays the list of added items. Ideally uses a `ListView.builder` for performance. Each item is dismissible (swipe-to-remove). The bottom summary section shows the Total Amount.
+
+**Data Flow:**
+Consumes `CartProvider`. It does not receive route arguments. Navigate to `CheckoutPage` when "Order Now" is clicked.
+
+**Widgets Used:**
+*   **`Dismissible`:** A widget that allows the user to swipe a list item to trigger an action (Remove). Requires a unique `key`.
+*   **`Card`:** Provides the elevation and rounded corners for each row.
+
+### `lib/screens/checkout_page.dart`
+**Structure & Logic:**
+A `StatefulWidget` managing a `Form`. It contains `TextEditingControllers` for Address, City, Zip. It has a section for "Coupon Code" input which calls `cart.applyCoupon()`. The "Place Order" button triggers a `try-catch` block that calls `orders.addOrder()`.
+
+**Data Flow:**
+Consumes `CartProvider` to get the final price. Navigates to `OrderConfirmationPage` on success.
+
+**Widgets Used:**
+*   **`TextFormField`:** Used for capturing shipping details.
+*   **`DropdownButton`:** (If used) For selecting Payment Method.
+*   **`FutureBuilder`:** (Sometimes used) to handle the async delay of the simulate payment.
+
+---
+
+## 4. Admin Panel (Hidden Feature)
+
+### `lib/screens/admin_page.dart`
+**Structure & Logic:**
+A screen combining a List View of all products and a Floating Action Button (FAB) to add new ones. The "Add Product" functions typically open a `Dialog` or `ModalBottomSheet` with a form.
+
+**Data Flow:**
+Uses `Provider.of<ProductsProvider>` to call `deleteProduct(id)` or `addProduct(product)`.
+
+**Widgets Used:**
+*   **`AlertDialog`:** Used for confirming deletion ("Are you sure?").
+*   **`ListTile`:** Standard widget for showing a row with `leading` (Image), `title`, and `trailing` (Edit/Delete icons).
+
+---
+
+## 5. Providers (State Logic)
+
+### `lib/providers/providers/products_provider.dart`
+**Structure:**
+Extends `ChangeNotifier`. Contains a private list `List<Product> _items`.
+**Key Function:** `fetchProducts()`: Async method. Calls `Firestore.collection('products').get()`. Iterates through `docs`, maps them to `Product`, assigns to local `_items`, and finally calls `notifyListeners()`.
+**Usage:** Access via `Provider.of<ProductsProvider>(context)`.
+
+### `lib/providers/cart_provider.dart`
+**Structure:**
+Extends `ChangeNotifier`. Uses a `Map<String, CartItem> _items` for O(1) access complexity (finding an item by ID is instant).
+**Key Function:** `addItem()`: Checks logic. If key exists, increase quantity. If not, put new entry.
+**Usage:** Access via `Consumer<CartProvider>` for reactive UI updates.

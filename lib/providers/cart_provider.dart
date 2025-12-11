@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:minimart/models/coupon.dart';
 
 class CartItem {
   final String id;
@@ -25,12 +27,66 @@ class CartProvider with ChangeNotifier {
     return _items.length;
   }
 
+  Coupon? _coupon;
+
+  Coupon? get coupon => _coupon;
+
   double get totalAmount {
     var total = 0.0;
     _items.forEach((key, cartItem) {
       total += cartItem.price * cartItem.quantity;
     });
+    
+    if (_coupon != null) {
+      if (_coupon!.discountType == 'percentage') {
+        total = total * (1 - (_coupon!.discountValue / 100));
+      } else {
+        total = total - _coupon!.discountValue;
+      }
+    }
+    
+    return total < 0 ? 0 : total;
+  }
+
+  double get subtotal {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
     return total;
+  }
+
+  double get discountAmount {
+    if (_coupon == null) return 0.0;
+    return subtotal - totalAmount;
+  }
+
+  Future<void> applyCoupon(String code) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('coupons')
+          .where('code', isEqualTo: code)
+          .get();
+
+      if (snapshot.docs.isEmpty) {
+        throw "Invalid coupon code";
+      }
+
+      final coupon = Coupon.fromFirestore(snapshot.docs.first);
+      if (!coupon.isValid) {
+        throw "Coupon has expired";
+      }
+
+      _coupon = coupon;
+      notifyListeners();
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
+  void removeCoupon() {
+    _coupon = null;
+    notifyListeners();
   }
 
   void addItem(String productId, double price, String title) {
@@ -86,6 +142,7 @@ class CartProvider with ChangeNotifier {
 
   void clear() {
     _items.clear();
+    _coupon = null;
     notifyListeners();
   }
 }

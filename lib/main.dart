@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:minimart/providers/cart_provider.dart';
-import 'package:minimart/providers/auth_provider.dart';
+import 'package:minimart/providers/auth_provider.dart'; // Still importing the file
 import 'package:minimart/providers/orders_provider.dart';
 import 'package:minimart/providers/products_provider.dart';
+import 'package:minimart/providers/theme_provider.dart';
+import 'package:minimart/providers/wishlist_provider.dart';
 import 'package:minimart/widgets/splash_screen.dart';
+import 'package:minimart/auth/login_screen.dart';
+import 'package:minimart/auth/signup_screen.dart';
+import 'package:minimart/auth/forgot_password_screen.dart';
+import 'package:minimart/screens/cart_page.dart';
+import 'package:minimart/screens/wishlist_page.dart';
+import 'package:minimart/screens/orders_page.dart';
+import 'package:minimart/screens/profile_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:minimart/firebase/firebase_options.dart';
 import 'package:minimart/theme/app_theme.dart';
+import 'package:minimart/services/seeder_service.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+
+// Import for Firebase Auth settings
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +31,16 @@ void main() async {
   // Initialize Firebase only if it hasn't been initialized already
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    
+    // Configure Firebase Auth settings for web
+    if (kIsWeb) {
+      // For web, we need to configure reCAPTCHA
+      await FirebaseAuth.instance.setSettings(
+        appVerificationDisabledForTesting: false,
+      );
+    }
+    
+    await SeederService.seedCoupons();
   } on FirebaseException catch (e) {
     if (e.code != 'duplicate-app') {
       rethrow;
@@ -40,15 +63,32 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AuthManager()), // Updated to use AuthManager
         ChangeNotifierProvider(create: (_) => OrdersProvider()),
         ChangeNotifierProvider(create: (_) => ProductsProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'MiniMart',
-        theme: AppTheme.lightTheme,
-        home: const SplashScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'MiniMart',
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: themeProvider.themeMode,
+            home: const SplashScreen(),
+            routes: {
+              '/login': (context) => const LoginScreen(),
+              '/signup': (context) => const SignupScreen(),
+              '/forgot-password': (context) => const ForgotPasswordScreen(),
+              '/cart': (context) => const CartPage(),
+              '/wishlist': (context) => const WishlistPage(),
+              '/orders': (context) => const OrdersPage(),
+              '/profile': (context) => const ProfilePage(),
+            },
+          );
+        },
       ),
     );
   }

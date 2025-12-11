@@ -1,0 +1,34 @@
+# Documentation Expansion Plan (Target: 3000+ Words)
+
+## Phase 1: Database & Core Architecture Deep Dive
+**Goal:** Expand Section 2 (Architecture) and create a new "Database Schema" section.
+*   **Action:** Document the exact JSON structure of every Firestore collection (`users`, `products`, `orders`, `coupons`).
+*   **Action:** Explain the "flutter-firebase" connection process (`firebase_options.dart`).
+*   **Action:** Detail the `main.dart` initialization sequence (Flutter binding, Firebase init, Provider injection).
+
+## Phase 2: Authentication & State Management Analysis
+**Goal:** Deep dive into `AuthProvider` and User Lifecycle.
+*   **Action:** Explain `StreamBuilder` and `authStateChanges`.
+*   **Action:** Analyze `signUp`, `login`, and `logout` functions line-by-line.
+*   **Action:** Detail how `Provider` works conceptually (ChangeNotifier, notifyListeners, context.watch/read).
+
+## Phase 3: Product Data Flow (Fetch, Search, Sort)
+**Goal:** Explain `ProductsProvider` and UI connection.
+*   **Action:** Document `fetchProducts()`: how it maps `QuerySnapshot` to `List<Product>`.
+*   **Action:** Explain the client-side Search algorithm (case-insensitive substring match).
+*   **Action:** Explain the Sort algorithm (Dart `List.sort` logic).
+*   **Action:** Detail the "Image Caching" behavior (NetworkImage).
+
+## Phase 4: The Order Processing Engine (Cart to Payment)
+**Goal:** Technical breakdown of the Checkout flow.
+*   **Action:** Explain `CartProvider`'s `Map<String, CartItem>` data structure.
+*   **Action:** Detail the Math behind `totalAmount` getter (Subtotal - key logic).
+*   **Action:** Analyze `Coupon` validation logic (Expiry check, Code match).
+*   **Action:** Breakdown `checkout_page.dart` "Place Order" function, including the `Future.delayed` simulation.
+
+## Phase 5: Advanced Services & Admin Internals
+**Goal:** Document Services and hidden features.
+*   **Action:** `AdminPage`: Explain the CRUD operations (`deleteProduct`, `addProduct`).
+
+## Execution Strategy
+I will update `resourse/Project_Summary_and_Manual.txt` iteratively, rewriting one major section at a time to ensure maximum detail without hitting output limits.

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:minimart/providers/auth_provider.dart';
+import 'package:minimart/providers/auth_provider.dart'; // This imports the file, but we use AuthManager
+import 'package:minimart/providers/theme_provider.dart';
+import 'package:minimart/theme/app_colors.dart';
+import 'package:minimart/screens/wishlist_page.dart';
+import 'package:minimart/screens/admin_page.dart';
 
 import 'package:minimart/widgets/snackbar.dart';
 
@@ -9,7 +13,7 @@ class ProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<AuthManager>(context); // Changed from AuthProvider to AuthManager
     final user = authProvider.user;
     final userData = authProvider.userData;
 
@@ -65,6 +69,23 @@ class ProfilePage extends StatelessWidget {
               ),
               child: Column(
                 children: [
+                  ListTile(
+                    leading: const Icon(
+                      Icons.favorite_border,
+                      color: Color(0xFF636E72),
+                    ),
+                    title: const Text("My Wishlist"),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WishlistPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
                   ListTile(
                     leading: const Icon(
                       Icons.person_outline,
@@ -197,6 +218,63 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Consumer<ThemeProvider>(
+                builder: (context, themeProvider, child) {
+                  return SwitchListTile(
+                    secondary: Icon(
+                      themeProvider.isDarkMode
+                          ? Icons.dark_mode_outlined
+                          : Icons.light_mode_outlined,
+                      color: const Color(0xFF636E72),
+                    ),
+                    title: const Text("Dark Mode"),
+                    value: themeProvider.isDarkMode,
+                    onChanged: (value) {
+                      themeProvider.toggleTheme(value);
+                    },
+                    activeColor: AppColors.primary,
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.admin_panel_settings, color: Colors.purple),
+                title: const Text("Admin Panel"),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () {
+                   Navigator.push(
+                     context,
+                     MaterialPageRoute(builder: (context) => const AdminPage()), // Need import
+                   );
+                },
               ),
             ),
             const SizedBox(height: 24),

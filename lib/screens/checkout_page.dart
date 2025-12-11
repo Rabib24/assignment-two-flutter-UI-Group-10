@@ -18,7 +18,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _addressController = TextEditingController();
+  final _couponController = TextEditingController();
+  String _selectedPaymentMethod = 'cod';
   bool _isLoading = false;
+  bool _isCheckingCoupon = false;
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +88,190 @@ class _CheckoutPageState extends State<CheckoutPage> {
               ),
               const SizedBox(height: 32),
               const Text(
+                "Payment Method",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  children: [
+                    RadioListTile(
+                      value: 'cod',
+                      groupValue: _selectedPaymentMethod,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedPaymentMethod = value.toString();
+                        });
+                      },
+                      title: const Text("Cash on Delivery"),
+                      secondary: const Icon(Icons.money, color: Colors.green),
+                      activeColor: AppColors.primary,
+                    ),
+                    RadioListTile(
+                      value: 'card',
+                      groupValue: _selectedPaymentMethod,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedPaymentMethod = value.toString();
+                        });
+                      },
+                      title: const Text("Credit/Debit Card"),
+                      secondary: const Icon(Icons.credit_card, color: Colors.blue),
+                      activeColor: AppColors.primary,
+                    ),
+                    RadioListTile(
+                      value: 'mobile_money',
+                      groupValue: _selectedPaymentMethod,
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedPaymentMethod = value.toString();
+                        });
+                      },
+                      title: const Text("Mobile Money (Bkash/Nagad)"),
+                      secondary: const Icon(Icons.phone_android, color: Colors.pink),
+                      activeColor: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                "Coupon Code",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary),
+              ),
+              const SizedBox(height: 16),
+              Consumer<CartProvider>(
+                builder: (context, cart, child) {
+                  if (cart.coupon != null) {
+                    return Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.green),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.local_offer, color: Colors.green),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Coupon Applied: ${cart.coupon!.code}",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green),
+                                ),
+                                Text(
+                                  cart.coupon!.discountType == 'percentage'
+                                      ? "${cart.coupon!.discountValue}% OFF"
+                                      : "৳${cart.coupon!.discountValue} OFF",
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.green),
+                                ),
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, color: Colors.red),
+                            onPressed: () {
+                              cart.removeCoupon();
+                              _couponController.clear();
+                              CustomSnackBar.show(context, "Coupon removed");
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _couponController,
+                          decoration: InputDecoration(
+                            hintText: "Enter coupon code",
+                            filled: true,
+                            fillColor: AppColors.background,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide.none,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      ElevatedButton(
+                        onPressed: _isCheckingCoupon
+                            ? null
+                            : () async {
+                                final code = _couponController.text.trim();
+                                if (code.isEmpty) return;
+
+                                setState(() {
+                                  _isCheckingCoupon = true;
+                                });
+
+                                try {
+                                  await cart.applyCoupon(code);
+                                  if (context.mounted) {
+                                    CustomSnackBar.show(
+                                        context, "Coupon applied successfully!");
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) {
+                                    CustomSnackBar.show(context, e.toString(),
+                                        isError: true);
+                                  }
+                                } finally {
+                                  if (mounted) {
+                                    setState(() {
+                                      _isCheckingCoupon = false;
+                                    });
+                                  }
+                                }
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.secondary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 14),
+                        ),
+                        child: _isCheckingCoupon
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Colors.white),
+                              )
+                            : const Text("Apply",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 32),
+              const Text(
                 "Order Summary",
                 style: TextStyle(
                   fontSize: 20,
@@ -111,7 +298,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               style: TextStyle(color: AppColors.textSecondary),
                             ),
                             Text(
-                              "৳${cart.totalAmount.toStringAsFixed(0)}",
+                              "৳${cart.subtotal.toStringAsFixed(0)}",
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
@@ -119,6 +306,26 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                           ],
                         ),
+                        if (cart.discountAmount > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Discount",
+                                  style: TextStyle(color: Colors.green),
+                                ),
+                                Text(
+                                  "-৳${cart.discountAmount.toStringAsFixed(0)}",
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         const SizedBox(height: 8),
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,6 +405,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             });
 
                             try {
+                              if (_selectedPaymentMethod != 'cod') {
+                                // Simulate payment processing delay
+                                await Future.delayed(const Duration(seconds: 2));
+                                // In a real app, integrate Stripe/PayPal here
+                              }
+                              // Added the requested mock delay here
+                              await Future.delayed(const Duration(seconds: 2));
+
                               await orders.addOrder(
                                 cart.items.values.toList(),
                                 cart.totalAmount,

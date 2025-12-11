@@ -1,0 +1,29 @@
+# Documentation Upgrade Plan
+
+## 1. Data Collection Strategy
+- **Code Analysis**:
+  - Scan `lib/` for all View/Model/Provider logic.
+  - Review `main.dart` for initialization flows (Auth, Seeder).
+  - Analyze `seeder_service.dart` for hardcoded demo data.
+  - Check `admin_page.dart` for specific CRUD capabilities.
+- **Feature Mapping**: Use `Task_File_Mapping.txt` to ensure every feature is documented.
+
+## 2. Structure for Project_Summary_and_Manual.txt
+1.  **Executive Summary**: High-level app purpose and tech stack.
+2.  **App Architecture & directory**: Detailed file structure explanation.
+3.  **Core Features & Usage**:
+    -   **User Module**: Auth, Profile, Wishlist.
+    -   **Shop Module**: Search, Sort, Product Details.
+    -   **Checkout Module**: Cart, Coupon Logic, Payment Simulation.
+    -   **Admin Module**: Access point, Capabilities (Add/Delete).
+4.  **Technical Deep Dive**:
+    -   **Providers**: How state is managed.
+    -   **Security**: Firestore rules (implied), Auth states.
+    -   **Services**: Data seeding.
+5.  **Demo Data Reference**:
+    -   List all pre-seeded Coupons (`SAVE10`, etc.).
+    -   List default products logic.
+6.  **Installation & Setup Guide**: Steps to compile and run.
+
+## 3. Execution Phase
+- Compile all gathered info into the final `Project_Summary_and_Manual.txt` file.

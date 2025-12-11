@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:minimart/auth/login_screen.dart';
 import 'package:minimart/screens/main_screen.dart';
 import 'package:provider/provider.dart';
-import 'package:minimart/providers/auth_provider.dart';
+import 'package:minimart/providers/auth_provider.dart'; // This imports the file, but we use AuthManager
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -56,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen>
     await _controller.forward();
     await Future.delayed(const Duration(milliseconds: 800));
     if (mounted) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthManager>(context, listen: false); // Changed from AuthProvider to AuthManager
       final Widget destination = authProvider.user != null
           ? const MainScreen()
           : const LoginScreen();

@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>MiniMart Project Documentation</title>
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <link rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+        <style>
+            :root {
+                --bg-sidebar: #1e1e1e;
+                --bg-main: #ffffff;
+                --text-sidebar: #d4d4d4;
+                --text-main: #333333;
+                --highlight: #007acc;
+                --border: #3c3c3c;
+            }
+
+            body {
+                margin: 0;
+                display: flex;
+                height: 100vh;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                overflow: hidden;
+            }
+
+            #sidebar {
+                width: 320px;
+                background-color: var(--bg-sidebar);
+                color: var(--text-sidebar);
+                border-right: 1px solid var(--border);
+                display: flex;
+                flex-direction: column;
+                flex-shrink: 0;
+            }
+
+            #sidebar-header {
+                padding: 20px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                border-bottom: 1px solid var(--border);
+                background-color: #252526;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            #file-list {
+                flex: 1;
+                overflow-y: auto;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .file-item {
+                padding: 12px 20px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                border-bottom: 1px solid #2d2d2d;
+                transition: background 0.2s;
+                font-size: 0.95rem;
+            }
+
+            .file-item:hover {
+                background-color: #2a2d2e;
+            }
+
+            .file-item.active {
+                background-color: #37373d;
+                border-left: 3px solid var(--highlight);
+                color: #fff;
+            }
+
+            .file-icon {
+                margin-right: 12px;
+                opacity: 0.7;
+            }
+
+            #main {
+                flex: 1;
+                background-color: var(--bg-main);
+                color: var(--text-main);
+                overflow-y: auto;
+                padding: 40px 60px;
+                line-height: 1.6;
+                position: relative;
+            }
+
+            #empty-state {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                color: #888;
+            }
+
+            #empty-state h2 {
+                margin-bottom: 10px;
+                color: #555;
+            }
+
+            .markdown-body {
+                max-width: 900px;
+                margin: 0 auto;
+                padding-bottom: 100px;
+            }
+
+            h1,
+            h2,
+            h3 {
+                border-bottom: 1px solid #eaecef;
+                padding-bottom: 0.3em;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+                margin-top: 24px;
+            }
+
+            h3 {
+                font-size: 1.25em;
+                margin-top: 20px;
+            }
+
+            pre {
+                background: #2d2d2d;
+                color: #f8f8f2;
+                padding: 16px;
+                border-radius: 6px;
+                overflow-x: auto;
+            }
+
+            blockquote {
+                border-left: 4px solid #007acc;
+                background-color: #f0f8ff;
+                color: #444;
+                margin: 0;
+                padding: 10px 20px;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 1rem;
+            }
+
+            th,
+            td {
+                border: 1px solid #dfe2e5;
+                padding: 8px 13px;
+            }
+
+            th {
+                background-color: #f6f8fa;
+                font-weight: 600;
+            }
+
+            tr:nth-child(2n) {
+                background-color: #fcfcfc;
+            }
+
+            img {
+                max-width: 100%;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                border-radius: 4px;
+            }
+
+            a {
+                color: #007acc;
+                text-decoration: none;
+            }
+
+            a:hover {
+                text-decoration: underline;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="sidebar">
+            <div id="sidebar-header"><span>📚 Docs Viewer</span></div>
+            <ul id="file-list"></ul>
+        </div>
+        <div id="main">
+            <div id="empty-state">
+                <div style="font-size: 4rem; margin-bottom: 20px;">📄</div>
+                <h2>Select a document to view</h2>
+                <p>Documents are loaded from the resource folder.</p>
+            </div>
+            <div id="content" class="markdown-body" style="display: none;"></div>
+        </div>
+        <script>
+            const documents = {
+                "Project_Summary_and_Manual.txt": `# MiniMart: The Ultimate Technical Reference & Operational Manual
+**Version:** 1.0.2 (Final Release)
+**Date:** December 2025
+**Author:** Development Team (Group 10)
+**Confidentiality:** Internal Distribution Only
+
+---
+
+## Table of Contents
+
+1.  [Executive Summary & Project Vision](#1-executive-summary--project-vision)
+    *   1.1 Project Overview
+    *   1.2 Core Objectives
+    *   1.3 Target Audience
+    *   1.4 Technology Stack Justification
+2.  [Functional Specifications](#2-functional-specifications)
+    *   2.1 User Roles & Permissions
+    *   2.2 Authentication & Security
+    *   2.3 Product Discovery (Search & Sort)
+    *   2.4 Shopping Cart Mechanics
+    *   2.5 Checkout & Payment Simulation
+    *   2.6 Order Management
+    *   2.7 Profile & Preferences
+    *   2.8 Administrative Features
+3.  [Technical Architecture & Design](#3-technical-architecture--design)
+    *   3.1 High-Level Architecture (MVVM + Provider)
+    *   3.2 State Management Strategy
+    *   3.3 Directory Structure Analysis (File-by-File)
+    *   3.4 Dependency Injection & Service Locator
+4.  [Database Schema & Data Modeling](#4-database-schema--data-modeling)
+    *   4.1 Firestore Design Philosophy
+    *   4.2 Collection: \`users\`
+    *   4.3 Collection: \`products\`
+    *   4.4 Collection: \`reviews\` (Sub-collection)
+    *   4.5 Collection: \`orders\`
+    *   4.6 Collection: \`coupons\`
+    *   4.7 Data Relationships & Indexing
+5.  [Code Base Deep Dive (Logic & Algorithms)](#5-code-base-deep-dive-logic--algorithms)
+    *   5.1 Authentication Logic (\`AuthProvider\`)
+    *   5.2 Product Fetching & Filtering (\`ProductsProvider\`)
+    *   5.3 Cart Mathematics & Coupon Validation (\`CartProvider\`)
+    *   5.4 Order Processing & Transaction Safety
+    *   5.5 Service Layer (\`NotificationService\`, \`SeederService\`)
+6.  [Security, Privacy & Compliance](#6-security-privacy--compliance)
+    *   6.1 Authentication Security
+    *   6.2 Firestore Security Rules (Production Ready)
+    *   6.3 Data Privacy Considerations
+7.  [Operational Manual & User Guide](#7-operational-manual--user-guide)
+    *   7.1 Installation & Setup
+    *   7.2 New User Registration
+    *   7.3 The Shopping Experience
+    *   7.4 Checkout & Payments
+    *   7.5 Admin Panel Operations
+8.  [Troubleshooting, Maintenance & FAQs](#8-troubleshooting-maintenance--faqs)
+9.  [Future Roadmap & Scalability](#9-future-roadmap--scalability)
+10. [Glossary of Technical Terms](#10-glossary-of-technical-terms)
+
+---
+
+## 1. Executive Summary & Project Vision
+
+### 1.1 Project Overview
+**MiniMart** is not merely a shopping application; it is a meticulously engineered, full-stack mobile e-commerce solution designed to demonstrate the pinnacle of modern Flutter development. Built to adhere to rigorous academic and industry standards (Assignment Two - Group 10), the application serves as a robust platform for buying and selling electronics and lifestyle products. It bridges the gap between a seamless user experience (UX) and a scalable, secure backend infrastructure provided by Google Firebase.
+
+The project was conceived to address the common pitfalls of mobile commerce: poor performance, lack of real-time updates, and insecure data handling. MiniMart solves these by leveraging Flutter's high-performance rendering engine and Firebase's real-time listeners.
+
+### 1.2 Core Objectives
+1.  **Seamless User Experience:** To provide a fluid, 60fps interface that feels responsive and alive, using optimistic UI updates and instant feedback loops.
+2.  **Robust Data Integrity:** To ensure that cart calculations, coupon applications, and order histories are mathematically precise and synchronized across devices.
+3.  **Scalable Architecture:** To verify that the code can grow from 10 products to 10,000 without requiring a rewrite, thanks to the Provider pattern and scalable NoSQL database design.
+4.  **Demonstrable Quality:** To serve as a reference implementation for features like Dark Mode, Local Notifications, and Admin CRUD operations.
+
+### 1.3 Target Audience
+*   **End Users:** Tech-savvy shoppers looking for a quick, reliable way to purchase gadgets on the go.
+*   **Administrators:** Shop managers who need instant analytics and control over inventory without needing a desktop computer.
+*   **Developers:** Future maintainers who need a clean, well-documented codebase to extend.
+
+### 1.4 Technology Stack Justification
+*   **Flutter (Dart):** Chosen for its "Write Once, Run Everywhere" capability, allowing us to target Android and iOS from a single codebase. Its widget-based architecture ensures pixel-perfect consistency.
+*   **Firebase Firestore:** Selected over SQL databases for its flexible schema (NoSQL) and, crucially, its **Real-time Stream** capabilities. This allows the Admin to add a product and have it instantly appear on a user's screen without a pull-to-refresh.
+*   **Firebase Authentication:** Provides enterprise-grade security for identity management (Email/Password) without the risk of rolling our own crypto implementation.
+*   **Provider Package:** The industry-standard for state management in Flutter. It is lighter than Bloc/Riverpod but powerful enough for complex e-commerce state (Cart dependencies, Auth state injection).
+
+---
+
+## 2. Functional Specifications
+
+### 2.1 User Roles & Permissions
+The system currently supports two logical roles, though they share the same login interface.
+*   **Standard Customer:** Can browse, search, add to cart, wishlist, checkout, and view their own order history. They *cannot* modify product data.
+*   **Administrator:** Possesses all Customer privileges but also has access to the **Admin Panel**. This role is currently protected by "Security by Obscurity" (hidden link) for the demo, but is architected to use Custom Claims in production.
+
+### 2.2 Authentication & Security
+*   **Sign Up:** Users register with Name, Email, Phone, and Password.
+    *   *Validation:* Emails must be valid formats (@ symbol). Passwords must be 6+ characters.
+    *   *Verification:* A verification email is sent upon registration.
+*   **Login:** Users authenticate with Email/Password.
+    *   *Persistence:* The session remains active even after app restart until explicit Logout.
+*   **Forgot Password:** A trigger mechanism sends a password reset link to the registered email.
+
+### 2.3 Product Discovery (Search & Sort)
+*   **Global Search:** Located in the App Bar. As the user types, the list filters in real-time.
+    *   *Algorithm:* Case-insensitive substring matching (\`String.contains\`).
+*   **Dynamic Sorting:** Users can reorder the product grid.
+    *   *Price (Low to High):* Useful for budget shoppers.
+    *   *Price (High to Low):* Useful for finding premium items.
+*   **Category Filtering:** (Visual) Products display their categories, allowing users to mentally group items like "Electronics" or "Footwear".
+
+### 2.4 Shopping Cart Mechanics
+The Cart is the most complex ephemeral state in the app.
+*   **Add to Cart:** If the item exists, quantity increments (\`qty + 1\`). If not, a new \`CartItem\` is created.
+*   **Quantity Management:** Users can swipe to remove items or use \`+\` / \`-\` buttons.
+*   **Real-time Totals:** The total price is a computed property that updates instantly (\`sum(price * qty)\`), triggering a UI rebuild of the checkout button.
+
+### 2.5 Checkout & Payment Simulation
+*   **Coupon System:** Users can input promo codes.
+    *   *Validation:* Checks Code Existence -> Expiry Date -> Usage Limit (optional).
+    *   *Math:* Supports both Percentage (\`%\`) and Fixed Amount (\`$\`) discounts.
+*   **Payment Methods:**
+    *   **Cash on Delivery (COD):** No processing time.
+    *   **Digital Payment (Card/Mobile):** Simulated with a \`Future.delayed\` of 2 seconds to mimic network latency. Includes a loading spinner to prevent double-clicks.
+
+### 2.6 Order Management
+*   **Order History:** Users can view a list of past orders.
+*   **Order Details:** Each order expands to show the date, total amount, and list of products purchased at that time (snapshot).
+*   **Status Tracking:** Orders have a status field (e.g., "Placed", "Shipped").
+
+### 2.7 Profile & Preferences
+*   **Dark Mode:** A global toggle that flips the \`ThemeData\`. This preference is saved locally (\`SharedPreferences\`).
+*   **Wishlist:** A persistent list of favorite items, stored in Firestore under the user's document.
+*   **Profile Editing:** Users can update their display name and phone number.
+
+### 2.8 Administrative Features
+*   **Product Creation:** Admin can input Name, Price, Description, Image URL, and Category.
+*   **Product Deletion:** Admin can remove obsolete items. This cascades to remove them from future search results (but preserves them in past order history records).
+
+---
+
+## 3. Technical Architecture & Design
+
+### 3.1 High-Level Architecture (MVVM + Provider)
+The application adheres to the **Model-View-ViewModel (MVVM)** pattern, adapted for Flutter using \`Provider\`.
+
+*   **Model (Data Layer):** 
+    *   Represented by Dart classes in \`lib/models/\`.
+    *   Responsible for defining the shape of data (e.g., \`Product\` class fields).
+    *   Handles JSON serialization/deserialization (\`fromMap\`, \`toMap\`).
+    *   *Pure Dart* - No UI code, no logic.
+
+*   **View (Presentation Layer):**
+    *   Represented by files in \`lib/screens/\` and \`lib/widgets/\`.
+    *   Responsible for *how* things look.
+    *   Passive components that listen to Providers.
+    *   Example: \`ShopPage\` listens to \`ProductsProvider\`. When the list changes, \`ShopPage\` rebuilds the grid.
+
+*   **ViewModel (Business Logic Layer):**
+    *   Represented by files in \`lib/providers/\`.
+    *   Responsible for *how* things work.
+    *   Holds the state (e.g., \`List<Product> _items\`).
+    *   Exposes methods to modify state (e.g., \`addProduct()\`).
+    *   Interacts with Services/Database.
+    *   Notifies listeners when state changes.
+
+### 3.2 State Management Strategy
+We use **MultiProvider** at the root of the app (\`main.dart\`). This "lifts state up" to the highest level, making it accessible everywhere.
+
+*   **\`AuthProvider\`:** Injected first. Used by potentially all other providers (e.g., Cart needs to know *who* owns it).
+*   **\`ProxyProvider\`:** (Conceptually used) - Providers that depend on other providers.
+*   **\`ChangeNotifier\`:** The base class for all providers. It gives us the magic \`notifyListeners()\` method.
+
+### 3.3 Directory Structure Analysis (File-by-File)
+
+**ROOT (\`lib/\`)**
+*   **\`main.dart\`**: The entry point.
+    *   *Responsibility:* Initializes Firebase, sets up Notifications, configures the Theme, and bootstraps the \`MultiProvider\` tree. Standardizes the \`MaterialApp\` routing.
+*   **\`firebase_options.dart\`**: Auto-generated by Firebase CLI. Contains API keys for Android/iOS.
+
+**\`lib/auth/\`** (Authentication Flows)
+*   **\`login_screen.dart\`**:
+    *   *UI:* TextFields for Email/Pass.
+    *   *Logic:* Calls \`Provider.of<AuthProvider>.login()\`. Handles exceptions (e.g., "User not found") and shows Snackbars.
+*   **\`signup_screen.dart\`**:
+    *   *UI:* Registration form.
+    *   *Logic:* Calls logic to create Auth Account + Firestore User Document.
+*   **\`forgot_password_screen.dart\`**:
+    *   *UI:* Email input.
+    *   *Logic:* Triggers Firebase password reset email.
+
+**\`lib/models/\`** (Data Definitions)
+*   **\`product.dart\`**: Defines \`id\`, \`title\`, \`description\`, \`price\`, \`imageUrl\`, \`category\`.
+*   **\`cart.dart\`**: Defines \`CartItem\` (subset of product + quantity).
+*   **\`order.dart\`**: Defines \`OrderItem\` (id, amount, products, datetime).
+*   **\`http_exception.dart\`**: Custom error class for handling API failures.
+
+**\`lib/providers/\`** (The Brains)
+*   **\`auth_provider.dart\`**:
+    *   *State:* \`_user\` (FirebaseUser).
+    *   *Methods:* \`signUp\`, \`login\`, \`logout\`, \`autoLogin\`.
+    *   *Streams:* Listens to \`FirebaseAuth.instance.authStateChanges()\`.
+*   **\`products_provider.dart\`**:
+    *   *State:* \`List<Product> _items\`.
+    *   *Methods:* \`fetchAndSetProducts\`, \`addProduct\`, \`deleteProduct\`, \`findById\`.
+    *   *Logic:* Handles the client-side Search and Sort filtering.
+*   **\`cart_provider.dart\`**:
+    *   *State:* \`Map<String, CartItem> _items\`.
+    *   *Methods:* \`addItem\`, \`removeItem\`, \`removeSingleItem\`, \`clear\`.
+    *   *Getter:* \`totalAmount\` (calculates the sum).
+    *   *Coupon:* \`applyCoupon\` (validates and stores active discount).
+*   **\`orders_provider.dart\`**:
+    *   *State:* \`List<OrderItem> _orders\`.
+    *   *Methods:* \`addOrder\` (pushes cart contents to Firestore), \`fetchAndSetOrders\`.
+*   **\`theme_provider.dart\`**:
+    *   *State:* \`ThemeMode\`.
+    *   *Methods:* \`toggleTheme\`. Persists preference to \`SharedPreferences\`.
+
+**\`lib/screens/\`** (The Face)
+*   **\`shop_page.dart\`**: The main landing. Contains the SearchBar, Filter Chips, and \`ProductGrid\`.
+*   **\`product_details_page.dart\`**: Full-screen view of an item. Shows Reviews list. "Add to Cart" FAB.
+*   **\`cart_page.dart\`**: Lists added items. "Swipe-to-Dismiss" widgets implemented here.
+*   **\`checkout_page.dart\`**: Address form. Coupon Input. Payment Selection. Final "Place Order" button.
+*   **\`orders_page.dart\`**: History list. Uses \`ExpansionTile\` to show order contents.
+*   **\`user_products_page.dart\`**: (Admin) List of products with Edit/Delete buttons.
+*   **\`edit_product_page.dart\`**: (Admin) Form to creating/updating products.
+
+**\`lib/services/\`** (Utility Layer)
+*   **\`notification_service.dart\`**:
+    *   *Init:* Requests permissions.
+    *   *FCM:* Handles background messages.
+    *   *Local:* Shows foreground heads-up notifications.
+*   **\`seeder_service.dart\`**: logic to populate the DB with demo data (Coupons/Products) if empty.
+
+**\`lib/widgets/\`** ( reusable components )
+*   **\`product_item.dart\`**: The Grid Tile. Shows Image, Title, Price. Heart Icon (Wishlist). Cart Icon.
+*   **\`badge.dart\`**: The red notification dot on the Cart Icon showing item count.
+*   **\`app_drawer.dart\`**: The side menu (Hamburger menu) for navigation.
+
+---
+
+## 4. Database Schema & Data Modeling
+
+The backend uses **Cloud Firestore**, a NoSQL document database. This choices prioritizes read speed and scalability.
+
+### 4.1 Firestore Design Philosophy
+We use a **denormalized** data structure where appropriate. For example, when an order is placed, we copy the product details (title, price) *into* the order document.
+*   *Why?* If the product price changes later, the Order History must still show the *original* price paid.
+*   *Trade-off:* Slightly more storage usage, but significantly faster reads and correct historical data.
+
+### 4.2 Collection: \`users\`
+*   **ID:** \`uid\` (Matches Auth UID)
+*   **Fields:**
+    *   \`email\` (string): Indexable.
+    *   \`displayName\` (string): User's full name.
+    *   \`phoneNumber\` (string): Contact info.
+    *   \`userRole\` (string): 'customer' | 'admin'.
+    *   \`wishlist\` (array of strings): List of Product IDs.
+    *   \`createdAt\` (timestamp).
+
+### 4.3 Collection: \`products\`
+*   **ID:** Auto-generated UUID.
+*   **Fields:**
+    *   \`title\` (string): Searchable.
+    *   \`description\` (string): Long text.
+    *   \`price\` (number/double): For sorting.
+    *   \`imageUrl\` (string): URL to storage.
+    *   \`category\` (string): For filtering.
+    *   \`isFavorite\` (boolean): (Note: Usually user-specific, but simple implementation puts it here. Better: User sub-collection).
+
+### 4.4 Collection: \`reviews\` (Sub-collection)
+*   **Path:** \`products/{productId}/reviews/{reviewId}\`
+*   **Fields:**
+    *   \`userId\` (string): Author.
+    *   \`userName\` (string): Display name.
+    *   \`rating\` (number): 1.0 to 5.0.
+    *   \`comment\` (string).
+    *   \`timestamp\` (timestamp): For sorting "Newest First".
+
+### 4.5 Collection: \`orders\`
+*   **ID:** Auto-generated UUID.
+*   **Fields:**
+    *   \`amount\` (number): Final paid price.
+    *   \`dateTime\` (timestamp).
+    *   \`userId\` (string): Owner.
+    *   \`products\` (array of maps):
+        *   \`id\`: Original Product ID.
+        *   \`title\`: Frozen title.
+        *   \`quantity\`: int.
+        *   \`price\`: Frozen price.
+    *   \`status\` (string): 'Pending', 'Completed', 'Cancelled'.
+
+### 4.6 Collection: \`coupons\`
+*   **ID:** Auto-generated or custom string.
+*   **Fields:**
+    *   \`code\` (string): The lookup key (e.g., 'SAVE10').
+    *   \`discountType\` (string): 'percentage' or 'fixed'.
+    *   \`value\` (number): 10 or 50.
+    *   \`expiryDate\` (timestamp).
+    *   \`isActive\` (boolean).
+
+---
+
+## 5. Code Base Deep Dive (Logic & Algorithms)
+
+### 5.1 Authentication Logic (\`AuthProvider\`)
+The \`AuthProvider\` is the lifecycle manager.
+1.  **Stream Setup:** inside the constructor, we often listen to \`FirebaseAuth.instance.authStateChanges()\`. This stream emits a \`User\` object whenever the auth state changes (login, logout, token refresh).
+2.  **\`signIn\` Method:**
+    *   Input: \`email\`, \`password\`.
+    *   Process: \`await _auth.signInWithEmailAndPassword(...)\`.
+    *   Post-Process: Fetch \`users/{uid}\` from Firestore to load the Profile (Name, Wishlist).
+    *   Notification: \`notifyListeners()\` triggers the UI to switch from \`AuthScreen\` to \`ShopScreen\`.
+
+### 5.2 Product Fetching & Filtering (\`ProductsProvider\`)
+1.  **Fetching Strategy:**
+    *   We use \`FirebaseFirestore.instance.collection('products').get()\`.
+    *   We map the \`QuerySnapshot\` docs into \`Product\` dart objects.
+    *   This list is stored in memory (\`_items\`).
+2.  **Client-Side Search:**
+    *   We do not query Firestore for every keystroke (too expensive/$).
+    *   Instead, we create a subset list: \`_items.where((prod) => prod.title.contains(query))\`.
+    *   This allows for instant substring search without network latency.
+
+### 5.3 Cart Mathematics & Coupon Validation (\`CartProvider\`)
+1.  **Map Structure:** We use a \`Map<String, CartItem>\` where the key is the \`productId\`.
+    *   *Add Operation:* \`if (map.containsKey(id)) { map[id].qty++; } else { map.putIfAbsent(id, new CartItem...); }\`. Time Complexity: O(1).
+2.  **Total Calculation:**
+    *   Base Total: \`_items.forEach((key, item) => total += item.price * item.quantity)\`.
+    *   Discount Application:
+        \`\`\`dart
+        if (couponType == 'percentage') {
+           return baseTotal * (1 - (couponValue / 100));
+        } else {
+           return baseTotal - couponValue;
+        }
+        \`\`\`
+    *   Edge Case: Ensures total never goes below zero.
+
+### 5.4 Order Processing & Transaction Safety
+When "Place Order" is clicked:
+1.  **Loader:** UI shows \`CircularProgressIndicator\`.
+2.  **Batch Write:** Ideally, we would use a Firestore Batch to (1) Create Order and (2) Decrement Inventory (if inventory tracking exists).
+3.  **Local Cleanup:** \`_cartProvider.clear()\` is called to empty the cart immediately locally, giving instant feedback.
+4.  **Error Handling:** Wrapped in \`try-catch\`. If Firestore fails (offline/permissions), the Cart is *not* cleared, and the user is alerted.
+
+---
+
+## 6. Security, Privacy & Compliance
+
+### 6.1 Authentication Security
+*   **Passwords:** Never stored locally or on our DB. Handled entirely by Firebase Auth (Google's securely salted/hashed servers).
+*   **Transport:** All traffic is over HTTPS/SSL automatically.
+
+### 6.2 Firestore Security Rules (Production Ready)
+The following rules should be deployed to the Firebase Console:
+
+\`\`\`javascript
+/* lib/security_rules/firestore.rules */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Function to check if user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Function to check if user is admin
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
+    }
+
+    // USERS: Users can read/write ONLY their own document
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // PRODUCTS: Public Read, Admin Write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ORDERS: Users can create orders, but only read their own
+    match /orders/{orderId} {
+      allow create: if isSignedIn();
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update, delete: if false; // Orders are immutable
+    }
+
+    // COUPONS: Public Read (to validate), Admin Write
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
+\`\`\`
+
+### 6.3 Data Privacy Considerations
+*   **User Data:** We only collect what is necessary (Name/Address) for shipping.
+*   **Deletion:** Users should have a "Delete Account" button (GDPR compliance) that triggers a Cloud Function to wipe their data from Auth and Firestore.
+
+---
+
+## 7. Operational Manual & User Guide
+
+### 7.1 Installation & Setup
+1.  **Prerequisites:** Flutter SDK 3.0+, Android Studio / VS Code.
+2.  **Clone:** \`git clone <repo-url>\`
+3.  **Dependencies:** Run \`flutter pub get\`.
+4.  **Firebase:**
+    *   Create a project on [console.firebase.google.com](https://console.firebase.google.com).
+    *   Enable Auth (Email/Pass) and Firestore.
+    *   Run \`flutterfire configure\`.
+5.  **Run:** \`flutter run\`.
+
+### 7.2 New User Registration
+*   Open App -> "Create Account".
+*   Enter valid Email (must contain @).
+*   Enter Password (min 6 chars).
+*   *Note:* First user created is NOT Admin automatically. You must manually edit Firestore.
+
+### 7.3 The Shopping Experience
+*   **Browse:** Scroll through the grid.
+*   **Filter:** Tap "Electronics" chip to see only gadgets.
+*   **Search:** Tap the Magnifying Glass. Type "Lap". See "Laptop" appear.
+*   **Details:** Tap a product. Read Reviews. Tap "Add to Cart".
+
+### 7.4 Checkout & Payments
+*   Go to Cart -> "Order Now".
+*   Select Address (or use default).
+*   **Coupon:** Try \`SAVE10\` (if seeded).
+*   **Payment:** Select "Credit Card". Tap "Place Order".
+*   *Observation:* Watch the spinner for 2 seconds (Simulation).
+*   *Success:* Redirected to Orders Page. notification appears.
+
+### 7.5 Admin Panel Operations
+*   **Access:** Go to Profile Page. Tap the hidden "Admin Panel" button (or ensures your userRole is 'admin' in DB).
+*   **Add Product:** Tap "+". Fill form. Image URL must be valid.
+*   **Edit:** Swipe left on a product in "Manage Products".
+*   **Delete:** Tap the Trash icon.
+
+---
+
+## 8. Troubleshooting, Maintenance & FAQs
+
+*   **Q: Images not loading?**
+    *   A: Check internet connection. Ensure \`imageUrl\` starts with \`https://\`.
+*   **Q: "Permission Denied" error?**
+    *   A: Check Firestore Security Rules. Ensure you are logged in.
+*   **Q: Notifications not showing?**
+    *   A: Android 13+ requires runtime permission. Go to Settings -> Apps -> MiniMart -> Permissions.
+
+---
+
+## 9. Future Roadmap & Scalability
+
+*   **Phase 4 (Post-Launch):**
+    *   Push Notifications (Cloud Functions triggers).
+    *   real Payment Gateway integration (Stripe).
+    *   Multi-language Support (Localization).
+*   **Scalability:**
+    *   Pagination for Products (Infinite Scroll).
+    *   Algolia for Search (fuzzy matching).
+
+---
+
+## 10. Glossary of Technical Terms
+
+*   **Provider:** A wrapper around InheritedWidget to make state accessible.
+*   **Stream:** A pipe of asynchronous data events (like a conveyor belt).
+*   **Future:** A promise that a value will be available later.
+*   **NoSQL:** "Not Only SQL". Flexible, schema-less database storage.
+*   **MVVM:** Model-View-ViewModel architectural pattern.
+*   **DTO:** Data Transfer Object.
+*   **Singleton:** A class that allows only one instance of itself to be created.
+`,
+                "directory.txt": `# Project Directory Structure
+# Root: d:\\MobileAPpFinalProject\\assignment-two-flutter-UI-Group-10-Sakib
+
+[ROOT]
+├── android/                   # Native Android code (Gradle, Manifest)
+├── ios/                       # Native iOS code (Runner, Info.plist)
+├── lib/                       # Main Dart source code
+│   ├── auth/                  # Authentication screens & logic
+│   │   ├── forgot_password_screen.dart  # Password reset flow
+│   │   ├── login_screen.dart            # Login form
+│   │   └── signup_screen.dart           # Registration form
+│   ├── models/                # Data models (Pure Dart classes)
+│   │   ├── cart.dart          # CartItem model
+│   │   ├── http_exception.dart# Custom error handling
+│   │   ├── order.dart         # Order & OrderItem models
+│   │   └── product.dart       # Product model
+│   ├── providers/             # State Management (ChangeNotifiers)
+│   │   ├── auth_provider.dart      # Auth state & Firebase calls
+│   │   ├── cart_provider.dart      # Cart logic (add/remove/total)
+│   │   ├── orders_provider.dart    # Order processing & history
+│   │   ├── products_provider.dart  # Product fetching & filtering
+│   │   └── theme_provider.dart     # Dark/Light mode state
+│   ├── screens/               # UI Screens (Pages)
+│   │   ├── admin_page.dart         # Admin Dashboard (CRUD)
+│   │   ├── cart_page.dart          # Shopping Cart View
+│   │   ├── checkout_page.dart      # Address & Payment
+│   │   ├── edit_product_page.dart  # Form to add/edit products
+│   │   ├── order_success_page.dart # Thank you screen
+│   │   ├── orders_page.dart        # Order History
+│   │   ├── product_details_page.dart # Single product (info + reviews)
+│   │   ├── profile_page.dart       # User Profile
+│   │   ├── shop_page.dart          # Home / Catalog Page
+│   │   └── user_products_page.dart # Admin list of products
+│   ├── services/              # Utility Services
+│   │   ├── notification_service.dart # Local Notifications
+│   │   └── seeder_service.dart       # Demo Data Injection
+│   ├── widgets/               # Reusable UI Components
+│   │   ├── app_drawer.dart    # Sidebar Navigation
+│   │   ├── badge.dart         # Cart count indicator
+│   │   ├── cart_item.dart     # Cart row item
+│   │   ├── order_item.dart    # Order history row
+│   │   ├── product_item.dart  # Catalog grid item
+│   │   └── user_product_item.dart # Admin list item
+│   ├── firebase_options.dart  # Firebase Configuration (Generated)
+│   └── main.dart              # App Entry Point & Provider Setup
+├── resourse/                  # Documentation & Assets
+│   ├── Documentation_Viewer.html    # This file!
+│   ├── Project_Summary_and_Manual.txt # Main Documentation
+│   ├── Task_File_Mapping.txt        # Technical Reference
+│   ├── directory.txt                # This file
+│   └── ... (other docs)
+├── test/                      # Automated Tests
+│   ├── demoData/
+│   │   └── demo_seeder.dart   # Test Data Script
+│   └── full_app_test.dart     # Integration Tests
+├── pubspec.yaml               # Dependencies & Assets Config
+└── todo.txt                   # Task Checklist
+`,
+                "Task_File_Mapping.txt": `# Task to Code File Mapping - Technical Reference
+
+## 1. Authentication Module
+*   **Login Flow**:
+    *   **UI**: \`lib/auth/login_screen.dart\` - Uses \`GlobalKey<FormState>\` for validation.
+    *   **Logic**: \`lib/providers/auth_provider.dart\` - \`login()\` method validates against Firebase Auth.
+    *   **Data**: \`lib/models/http_exception.dart\` - Handles error parsing.
+
+## 2. Product Discovery
+*   **Catalog**: \`lib/screens/shop_page.dart\` - Uses \`GridView.builder\` and \`ProductItem\`.
+*   **Item**: \`lib/widgets/product_item.dart\` - Displays image, price, title.
+*   **State**: \`lib/providers/products_provider.dart\` - \`fetchAndSetProducts()\` gets data from Firestore.
+*   **Search**: \`lib/screens/shop_page.dart\` - Contains text field that filters \`ProductsProvider._items\`.
+
+## 3. Cart & Checkout
+*   **Cart State**: \`lib/providers/cart_provider.dart\` - Manages \`Map<String, CartItem>\`.
+*   **Cart UI**: \`lib/screens/cart_page.dart\` - Lists items, shows total.
+*   **Checkout**: \`lib/screens/checkout_page.dart\` - Handles Address input, Payment Selection, Coupon.
+*   **Orders**: \`lib/providers/orders_provider.dart\` - \`addOrder()\` saves to Firestore.
+
+## 4. Admin Panel
+*   **Access**: \`lib/screens/profile_page.dart\` (Hidden Button) -> \`lib/screens/admin_page.dart\`.
+*   **CRUD**: \`lib/screens/edit_product_page.dart\` - Form for Product creation/editing.
+*   **Listing**: \`lib/screens/user_products_page.dart\` - List for Admin to manage items.
+
+## 5. Providers (State Management)
+*   **Auth**: \`auth_provider.dart\` - User session.
+*   **Products**: \`products_provider.dart\` - Inventory.
+*   **Cart**: \`cart_provider.dart\` - Shopping bag.
+*   **Orders**: \`orders_provider.dart\` - Transaction history.
+*   **Theme**: \`theme_provider.dart\` - Dark/Light mode.
+`
+                ,
+                "Project_Contributions.txt": `# Project Contributions Report & Handover
+
+## Overview
+This document details the division of work between team members for the MiniMart project.
+
+## 👤 Member 1 Contributions (Foundational & Core)
+**Focus:** Project Setup, Core Architecture, Authentication, and Basic E-commerce Flow.
+
+### 1. Core Infrastructure
+- **Project Setup:** Initial Flutter app creation, Firebase project configuration (Android/iOS).
+- **State Management:** Implemented the \`Provider\` architecture (\`AuthProvider\`, \`ProductsProvider\`, \`CartProvider\`, \`OrdersProvider\`).
+- **Database:** Designed Firestore schema for Users, Products, and Orders.
+
+### 2. Authentication & User Management
+- **Firebase Auth:** Implemented Sign Up, Sign In, and Sign Out functionalities.
+- **Security:** Added Email Verification workflow and securely stored user data.
+- **Profile:** Basic profile view and editing (Name/Phone).
+
+### 3. Product & Shopping Core
+- **Product Catalog:** Fetched and displayed products from Firestore in \`ShopPage\`.
+- **Product Details:** Created detailed view with images and description.
+- **Cart System:**
+  - Full CRUD operations (Add, Remove, update Quantity).
+  - Real-time subtotal calculation.
+- **Checkout & Orders:**
+  - Built \`CheckoutPage\` (Form validation, Address input).
+  - Implemented Order placement logic.
+  - created \`OrdersPage\` to view order history.
+
+### 4. UI/UX Essentials
+- **Navigation:** App Drawer and Custom Bottom Navigation Bar.
+- **Splash Screen:** Animated starting screen.
+- **Visuals:** Base theme setup, Pull-to-refresh, and Toast/Snackbar notifications.
+
+---
+
+## 👤 Member 2 Contributions (Enhancements & Advanced Features)
+**Focus:** User Experience (UX), Engagement, and Advanced Functionality (Phases 1-3).
+
+### 1. Essential UX Enhancements
+- **Search Functionality:**
+  - Implemented real-time product search in \`ShopPage\`.
+  - Added search bar widget with filtering logic.
+- **Sorting System:**
+  - Added ability to sort products by Price (Low to High / High to Low).
+  - Integrated \`PopupMenuButton\` for sort options.
+- **Dark Mode:**
+  - Performed full app styling for Dark Theme support.
+  - created \`ThemeProvider\` for state persistence.
+  - Added Dark Mode toggle switch in \`ProfilePage\`.
+- **Wishlist System:**
+  - Created \`WishlistProvider\` to manage favorites in Firestore (\`users/{uid}/wishlist\`).
+  - Built \`WishlistPage\` to display saved items.
+  - Added interactive "Heart" icon to product cards.
+
+### 2. User Engagement Features
+- **Product Reviews:**
+  - Designed \`Review\` model and Firestore sub-collection structure (\`products/{id}/reviews\`).
+  - Developed \`ProductReviews\` widget for \`ProductDetailsPage\`.
+  - Implemented "Write a Review" dialog with star rating and comment input.
+- **Coupon System:**
+  - Created \`Coupon\` model (supporting Percentage and Fixed discounts).
+  - Developed \`SeederService\` to auto-populate test coupons (\`SAVE10\`, \`WELCOME20\`).
+  - Integrated Coupon input field and discount calculation in \`CartProvider\` and \`CheckoutPage\`.
+
+### 3. Advanced Features
+- **Push Notifications:**
+  - Integrated \`firebase_messaging\` and \`flutter_local_notifications\`.
+  - Created \`NotificationService\` to handle foreground and background messages.
+  - Configured Android permissions and initialization in \`main.dart\`.
+- **Payment Gateway Simulation:**
+  - Enhanced \`CheckoutPage\` with Payment Method selection.
+  - Supported options: **Cash on Delivery**, **Credit/Debit Card**, **Mobile Money**.
+  - Implemented Mock Payment Processing (simulated delay) for non-COD methods.
+
+### 4. Documentation & Maintenance
+- **Refactoring:** Cleaned up provider logic and separated UI widgets.
+- **Documentation:** Updated \`Project_Summary_and_Manual.txt\` with new feature instructions.
+- **Tracking:** Updated \`todo.txt\` to reflect completed status of assigned tasks.
+
+---
+
+## Handover Notes for Member 3
+- All features verify correctly on Android.
+- **Coupons to test:** \`SAVE10\` (10% off), \`WELCOME20\` (20% off), \`FLAT50\` (50 off).
+- **Payment:** Credit Card selection simulates a 2-second processing delay.
+- **Notifications:** Ready for testing; use Firebase Console to send test messages.
+`,
+                "Documentation_Plan.txt": `# Documentation Upgrade Plan
+
+## 1. Data Collection Strategy
+- **Code Analysis**:
+  - Scan \`lib/\` for all View/Model/Provider logic.
+  - Review \`main.dart\` for initialization flows (Auth, Seeder, Notifications).
+  - Analyze \`seeder_service.dart\` for hardcoded demo data.
+  - Check \`admin_page.dart\` for specific CRUD capabilities.
+- **Feature Mapping**: Use \`Task_File_Mapping.txt\` to ensure every feature is documented.
+
+## 2. Structure for Project_Summary_and_Manual.txt
+1.  **Executive Summary**: High-level app purpose and tech stack.
+2.  **App Architecture & directory**: Detailed file structure explanation.
+3.  **Core Features & Usage**:
+    -   **User Module**: Auth, Profile, Wishlist.
+    -   **Shop Module**: Search, Sort, Product Details, Reviews.
+    -   **Checkout Module**: Cart, Coupon Logic, Payment Simulation.
+    -   **Admin Module**: Access point, Capabilities (Add/Delete).
+4.  **Technical Deep Dive**:
+    -   **Providers**: How state is managed.
+    -   **Security**: Firestore rules (implied), Auth states.
+    -   **Services**: Notification handing, Data seeding.
+5.  **Demo Data Reference**:
+    -   List all pre-seeded Coupons (\`SAVE10\`, etc.).
+    -   List default products logic.
+6.  **Installation & Setup Guide**: Steps to compile and run.
+
+## 3. Execution Phase
+- Compile all gathered info into the final \`Project_Summary_and_Manual.txt\` file.
+`,
+                "Comparison_and_Status.txt": `# Project Completion Comparison
+Target Project: P004 — E-commerce Mini Shopping Cart
+
+## Completion Status
+| Requirement | Status | Implementation Details |
+| :--- | :--- | :--- |
+| **1. Product Catalog** | ✅ Completed | Implemented in \`ShopPage\`. Fetches products from Provider. |
+| **2. Product Details** | ✅ Completed | Implemented in \`ProductDetailsPage\`. Shows details and "Add to Cart". |
+| **3. Cart Screen** | ✅ Completed | Implemented in \`CartPage\`. Supports quantity adjustment and removal. |
+| **4. Order Placement** | ✅ Completed | Implemented in \`CheckoutPage\`. Collects user details. |
+| **5. Order Confirmation** | ✅ Completed | Implemented in \`OrderConfirmationPage\`. |
+| **6. Order ID Generation** | ✅ Completed | Uses Firebase Document ID (\`docRef.id\`) in \`OrdersProvider\`. |
+| **7. Order History** | ✅ Completed | Implemented in \`OrdersPage\`. Fetches from \`users/{uid}/orders\`. |
+| **8. Checkout** | ✅ Completed | Saves summary to Firebase and clears cart (\`cart.clear()\`). |
+
+## Summary
+All 8 core functionalities specified in "MobileApp Final Project .txt" for P004 are fully implemented in the codebase. The project meets all functional requirements.
+`,
+                "GithubManagement.txt": `I'll provide you with step-by-step instructions to set up Git for your Flutter project and push your changes to your branch. Here's how to do it:
+
+## Step-by-Step Git Configuration
+
+### 1. Initialize Git in Your Local Project Folder
+
+First, navigate to your project directory and initialize a Git repository:
+
+\`\`\`bash
+cd "c:\\Users\\rabib\\Downloads\\MobileAPpFinalProject\\assignment-two-flutter-UI-Group-10-Sakib"
+git init
+\`\`\`
+
+### 2. Connect to the Remote Repository
+
+Add the remote repository URL:
+
+\`\`\`bash
+git remote add origin https://github.com/Rabib24/assignment-two-flutter-UI-Group-10.git
+\`\`\`
+
+Verify that the remote has been added correctly:
+
+\`\`\`bash
+git remote -v
+\`\`\`
+
+### 3. Create and Switch to Your "Rabib" Branch
+
+Create and switch to your branch:
+
+\`\`\`bash
+git checkout -b Rabib
+\`\`\`
+
+### 4. Add, Commit, and Push Your Changes
+
+Add all your files to Git:
+
+\`\`\`bash
+git add .
+\`\`\`
+
+Commit your changes with a descriptive message:
+
+\`\`\`bash
+git commit -m "Initial commit with Flutter project files and updates"
+\`\`\`
+
+Push your changes to your branch on GitHub:
+
+\`\`\`bash
+git push -u origin Rabib
+\`\`\`
+
+## Additional Git Commands You Might Find Useful
+
+If you need to check the status of your repository at any time:
+
+\`\`\`bash
+git status
+\`\`\`
+
+To see the commit history:
+
+\`\`\`bash
+git log --oneline
+\`\`\`
+
+If you later make changes and want to push them:
+
+\`\`\`bash
+git add .
+git commit -m "Description of your changes"
+git push origin Rabib
+\`\`\`
+
+## Important Notes
+
+1. Make sure you have Git installed on your system
+2. The first time you push, you might be prompted for your GitHub username and password (or personal access token)
+3. If the remote branch already exists, you might need to pull first:
+   \`\`\`bash
+   git pull origin Sakib
+   \`\`\`
+4. If you encounter any merge conflicts, you'll need to resolve them before pushing
+
+These steps will successfully link your local Flutter project to the GitHub repository and push your updated code to your "Rabib" branch.
+`,
+                "Extra.txt": `# Extra Features
+
+## Authentication
+1. Email Verification: Users must verify email before full access.
+2. Profile: Editable name and phone number.
+
+## UI/UX
+1. Splash Screen: Intro screen on startup.
+2. Custom Design: Gradient app bar and colored buttons.
+3. Bottom Navigation: Easy switching between Home, Cart, and Profile.
+4. Drawer Menu: Additional navigation options.
+5. Location Selector: Predefined list of locations.
+6. Feedback: Snackbars show success/error messages.
+7. Loading States: Indicators shown during data fetch.
+8. Interactive Cart: Swipe to remove locally (optional) or confirmation dialogs.
+
+## Technical Features
+1. State Management: Uses Provider for app-wide state.
+2. Data Sync: Real-time updates from Firebase.
+3. Image Caching: Optimized image loading.
+4. Input Validation: Ensures correct data entry (email, phone).
+5. Error Handling: User-friendly error messages.
+
+## Security
+1. Secure Inputs: Password visibility toggle.
+2. Data Privacy: Users only see their own orders.
+
+This list highlights the value-added features that improve the app beyond the basic assignment.
+`,
+                "Documentation_Expansion_Plan.txt": `# Documentation Expansion Plan (Target: 3000+ Words)
+
+## Phase 1: Database & Core Architecture Deep Dive
+**Goal:** Expand Section 2 (Architecture) and create a new "Database Schema" section.
+*   **Action:** Document the exact JSON structure of every Firestore collection (\`users\`, \`products\`, \`orders\`, \`coupons\`, \`reviews\`).
+*   **Action:** Explain the "flutter-firebase" connection process (\`firebase_options.dart\`).
+*   **Action:** Detail the \`main.dart\` initialization sequence (Flutter binding, Firebase init, Provider injection).
+
+## Phase 2: Authentication & State Management Analysis
+**Goal:** Deep dive into \`AuthProvider\` and User Lifecycle.
+*   **Action:** Explain \`StreamBuilder\` and \`authStateChanges\`.
+*   **Action:** Analyze \`signUp\`, \`login\`, and \`logout\` functions line-by-line.
+*   **Action:** Detail how \`Provider\` works conceptually (ChangeNotifier, notifyListeners, context.watch/read).
+
+## Phase 3: Product Data Flow (Fetch, Search, Sort)
+**Goal:** Explain \`ProductsProvider\` and UI connection.
+*   **Action:** Document \`fetchProducts()\`: how it maps \`QuerySnapshot\` to \`List<Product>\`.
+*   **Action:** Explain the client-side Search algorithm (case-insensitive substring match).
+*   **Action:** Explain the Sort algorithm (Dart \`List.sort\` logic).
+*   **Action:** Detail the "Image Caching" behavior (NetworkImage).
+
+## Phase 4: The Order Processing Engine (Cart to Payment)
+**Goal:** Technical breakdown of the Checkout flow.
+*   **Action:** Explain \`CartProvider\`'s \`Map<String, CartItem>\` data structure.
+*   **Action:** Detail the Math behind \`totalAmount\` getter (Subtotal - key logic).
+*   **Action:** Analyze \`Coupon\` validation logic (Expiry check, Code match).
+*   **Action:** Breakdown \`checkout_page.dart\` "Place Order" function, including the \`Future.delayed\` simulation.
+
+## Phase 5: Advanced Services & Admin Internals
+**Goal:** Document Services and hidden features.
+*   **Action:** \`SeederService\`: Explain the "Check-then-Write" logic to prevent duplicates.
+*   **Action:** \`NotificationService\`: Explain the difference between Foreground (Local) and Background (FCM) handling.
+*   **Action:** \`AdminPage\`: Explain the CRUD operations (\`deleteProduct\`, \`addProduct\`).
+
+## Execution Strategy
+I will update \`resourse/Project_Summary_and_Manual.txt\` iteratively, rewriting one major section at a time to ensure maximum detail without hitting output limits.
+`,
+                "MobileApp  Final Project .txt": `Final Project Document 
+
+Tech Stack: Flutter + Firebase + Provider
+Restrictions:
+* No file uploads
+* No push notifications
+* No platform-specific features
+* Uses only Firebase Firestore (no storage)
+* Beginner-friendly CRUD + simple UI
+* Phone-only, no backend server
+
+
+________________
+
+
+Project List
+Project ID
+	Name
+	P004
+	E-commerce Mini Shopping Cart (Unsplash Images)
+	
+
+________________
+________________
+
+
+P004 — E-commerce Mini Shopping Cart (Unsplash Images)
+Project Story
+A tiny online store app with product browsing and cart management. All product images come from preset Unsplash URLs (no file upload).
+
+
+________________
+
+
+Functionalities
+1. Product Catalog Load from Firebase Each product has name, price, category, image URL
+2. Product Details Larger image Name, price, description Add to cart
+3. Cart Screen Increase/decrease quantity Remove item Auto-update totals
+4. Order Placement Place order with customer details (name, phone, address)
+5. Order confirmation screen Order with status (Order placed) 
+6. Order ID generation (Firebase Document ID)
+7. Order History View all placed orders Filter orders by status View order details
+8. Checkout Save order summary in Firebase Clear cart when done
+
+
+________________
+
+
+Firebase Structure
+/products
+  /productId
+    name
+    price
+    category
+    imageUrl
+
+
+/orders
+  /orderId
+    items
+    total
+    date
+    status
+    customerName
+    customerPhone
+    customerAddress
+    orderId
+
+________________
+
+
+P005 — Simple Expense Calculator
+Project Story
+A lightweight expense tracker app. Users can add expenses, view totals, filter by category, and manage their expense entries.
+
+
+________________
+
+
+Functionalities
+1. Add Expense Name Amount Date Category Description (optional)
+2. Expense List all entries Swipe to delete Edit expense entries
+3. Total Expense Auto-calculated total from all expenses Category-wise total display
+4. Category Filter expenses by category Default categories: Food, Transport, Entertainment, Shopping, Bills, Other
+5. Search Expenses by name
+6. Sort Expenses Sort by date (newest first) Sort by amount (high to low)
+7. Firebase Sync All expenses stored in Firestore Real-time sync across devices
+
+
+________________
+
+
+Firebase Structure
+/expenses
+  /expenseId
+    name
+    amount
+    date
+    category
+    description
+    createdAt
+
+________________`
+            };
+
+            const fileListFn = document.getElementById('file-list');
+            const contentDiv = document.getElementById('content');
+            const emptyState = document.getElementById('empty-state');
+
+            Object.keys(documents).forEach(filename => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.innerHTML = `<span class="file-icon">📜</span> ${filename}`;
+                li.onclick = () => loadDocument(filename, li);
+                fileListFn.appendChild(li);
+            });
+
+            function loadDocument(filename, element) {
+                document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                emptyState.style.display = 'none';
+                contentDiv.style.display = 'block';
+                document.getElementById('main').scrollTop = 0;
+                const rawContent = documents[filename];
+                contentDiv.innerHTML = marked.parse(rawContent);
+                document.querySelectorAll('pre code').forEach((block) => { hljs.highlightElement(block); });
+            }
+
+            marked.setOptions({ gfm: true, breaks: true, headerIds: true });
+        </script>
+    </body>
+
+</html>

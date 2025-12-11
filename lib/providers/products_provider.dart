@@ -33,4 +33,33 @@ class ProductsProvider with ChangeNotifier {
       debugPrint("Error fetching products: $e");
     }
   }
+
+  Future<void> addProduct(Map<String, dynamic> productData) async {
+    try {
+      await FirebaseFirestore.instance.collection('products').add(productData);
+      await fetchProducts(); // Refresh list
+    } catch (e) {
+      debugPrint("Error adding product: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> deleteProduct(String productId) async {
+    try {
+      await FirebaseFirestore.instance.collection('products').doc(productId).delete();
+      _products.removeWhere((p) => p.id == productId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error deleting product: $e");
+      rethrow;
+    }
+  }
+
+  Product? findById(String id) {
+    try {
+      return _products.firstWhere((product) => product.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
 }

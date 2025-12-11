@@ -1,0 +1,564 @@
+# MiniMart: The Ultimate Technical Reference & Operational Manual
+**Version:** 1.0.2 (Final Release)
+**Date:** December 2025
+**Author:** Development Team (Group 10)
+**Confidentiality:** Internal Distribution Only
+
+---
+
+## Table of Contents
+
+1.  [Executive Summary & Project Vision](#1-executive-summary--project-vision)
+    *   1.1 Project Overview
+    *   1.2 Core Objectives
+    *   1.3 Target Audience
+    *   1.4 Technology Stack Justification
+2.  [Functional Specifications](#2-functional-specifications)
+    *   2.1 User Roles & Permissions
+    *   2.2 Authentication & Security
+    *   2.3 Product Discovery (Search & Sort)
+    *   2.4 Shopping Cart Mechanics
+    *   2.5 Checkout & Payment Simulation
+    *   2.6 Order Management
+    *   2.7 Profile & Preferences
+    *   2.8 Administrative Features
+3.  [Technical Architecture & Design](#3-technical-architecture--design)
+    *   3.1 High-Level Architecture (MVVM + Provider)
+    *   3.2 State Management Strategy
+    *   3.3 Directory Structure Analysis (File-by-File)
+    *   3.4 Dependency Injection & Service Locator
+4.  [Database Schema & Data Modeling](#4-database-schema--data-modeling)
+    *   4.1 Firestore Design Philosophy
+    *   4.2 Collection: `users`
+    *   4.3 Collection: `products`
+
+    *   4.5 Collection: `orders`
+    *   4.6 Collection: `coupons`
+    *   4.7 Data Relationships & Indexing
+5.  [Code Base Deep Dive (Logic & Algorithms)](#5-code-base-deep-dive-logic--algorithms)
+    *   5.1 Authentication Logic (`AuthProvider`)
+    *   5.2 Product Fetching & Filtering (`ProductsProvider`)
+    *   5.3 Cart Mathematics & Coupon Validation (`CartProvider`)
+    *   5.4 Order Processing & Transaction Safety
+    *   5.5 Service Layer (`SeederService`)
+6.  [Security, Privacy & Compliance](#6-security-privacy--compliance)
+    *   6.1 Authentication Security
+    *   6.2 Firestore Security Rules (Production Ready)
+    *   6.3 Data Privacy Considerations
+7.  [Operational Manual & User Guide](#7-operational-manual--user-guide)
+    *   7.1 Installation & Setup
+    *   7.2 New User Registration
+    *   7.3 The Shopping Experience
+    *   7.4 Checkout & Payments
+    *   7.5 Admin Panel Operations
+8.  [Troubleshooting, Maintenance & FAQs](#8-troubleshooting-maintenance--faqs)
+9.  [Future Roadmap & Scalability](#9-future-roadmap--scalability)
+10. [Glossary of Technical Terms](#10-glossary-of-technical-terms)
+
+---
+
+## 1. Executive Summary & Project Vision
+
+### 1.1 Project Overview
+**MiniMart** is not merely a shopping application; it is a meticulously engineered, full-stack mobile e-commerce solution designed to demonstrate the pinnacle of modern Flutter development. Built to adhere to rigorous academic and industry standards (Assignment Two - Group 10), the application serves as a robust platform for buying and selling electronics and lifestyle products. It bridges the gap between a seamless user experience (UX) and a scalable, secure backend infrastructure provided by Google Firebase.
+
+The project was conceived to address the common pitfalls of mobile commerce: poor performance, lack of real-time updates, and insecure data handling. MiniMart solves these by leveraging Flutter's high-performance rendering engine and Firebase's real-time listeners.
+
+### 1.2 Core Objectives
+1.  **Seamless User Experience:** To provide a fluid, 60fps interface that feels responsive and alive, using optimistic UI updates and instant feedback loops.
+2.  **Robust Data Integrity:** To ensure that cart calculations, coupon applications, and order histories are mathematically precise and synchronized across devices.
+3.  **Scalable Architecture:** To verify that the code can grow from 10 products to 10,000 without requiring a rewrite, thanks to the Provider pattern and scalable NoSQL database design.
+4.  **Demonstrable Quality:** To serve as a reference implementation for features like Dark Mode, Wishlist, and Admin CRUD operations.
+
+### 1.3 Target Audience
+*   **End Users:** Tech-savvy shoppers looking for a quick, reliable way to purchase gadgets on the go.
+*   **Administrators:** Shop managers who need instant analytics and control over inventory without needing a desktop computer.
+*   **Developers:** Future maintainers who need a clean, well-documented codebase to extend.
+
+### 1.4 Technology Stack Justification
+*   **Flutter (Dart):** Chosen for its "Write Once, Run Everywhere" capability, allowing us to target Android and iOS from a single codebase. Its widget-based architecture ensures pixel-perfect consistency.
+*   **Firebase Firestore:** Selected over SQL databases for its flexible schema (NoSQL) and, crucially, its **Real-time Stream** capabilities. This allows the Admin to add a product and have it instantly appear on a user's screen without a pull-to-refresh.
+*   **Firebase Authentication:** Provides enterprise-grade security for identity management (Email/Password) without the risk of rolling our own crypto implementation.
+*   **Provider Package:** The industry-standard for state management in Flutter. It is lighter than Bloc/Riverpod but powerful enough for complex e-commerce state (Cart dependencies, Auth state injection).
+
+---
+
+## 2. Functional Specifications
+
+### 2.1 User Roles & Permissions
+The system currently supports two logical roles, though they share the same login interface.
+*   **Standard Customer:** Can browse, search, add to cart, wishlist, checkout, and view their own order history. They *cannot* modify product data.
+*   **Administrator:** Possesses all Customer privileges but also has access to the **Admin Panel**. This role is currently protected by "Security by Obscurity" (hidden link) for the demo, but is architected to use Custom Claims in production.
+
+### 2.2 Authentication & Security
+*   **Sign Up:** Users register with Name, Email, Phone, and Password.
+    *   *Validation:* Emails must be valid formats (@ symbol). Passwords must be 6+ characters.
+    *   *Verification:* A verification email is sent upon registration.
+*   **Login:** Users authenticate with Email/Password.
+    *   *Persistence:* The session remains active even after app restart until explicit Logout.
+*   **Forgot Password:** A trigger mechanism sends a password reset link to the registered email.
+
+### 2.3 Product Discovery (Search & Sort)
+*   **Global Search:** Located in the App Bar. As the user types, the list filters in real-time.
+    *   *Algorithm:* Case-insensitive substring matching (`String.contains`).
+*   **Dynamic Sorting:** Users can reorder the product grid.
+    *   *Price (Low to High):* Useful for budget shoppers.
+    *   *Price (High to Low):* Useful for finding premium items.
+*   **Category Filtering:** (Visual) Products display their categories, allowing users to mentally group items like "Electronics" or "Footwear".
+
+### 2.4 Shopping Cart Mechanics
+The Cart is the most complex ephemeral state in the app.
+*   **Add to Cart:** If the item exists, quantity increments (`qty + 1`). If not, a new `CartItem` is created.
+*   **Quantity Management:** Users can swipe to remove items or use `+` / `-` buttons.
+*   **Real-time Totals:** The total price is a computed property that updates instantly (`sum(price * qty)`), triggering a UI rebuild of the checkout button.
+
+### 2.5 Checkout & Payment Simulation
+*   **Coupon System:** Users can input promo codes.
+    *   *Validation:* Checks Code Existence -> Expiry Date -> Usage Limit (optional).
+    *   *Math:* Supports both Percentage (`%`) and Fixed Amount (`$`) discounts.
+*   **Payment Methods:**
+    *   **Cash on Delivery (COD):** No processing time.
+    *   **Digital Payment (Card/Mobile):** Simulated with a `Future.delayed` of 2 seconds to mimic network latency. Includes a loading spinner to prevent double-clicks.
+
+### 2.6 Order Management
+*   **Order History:** Users can view a list of past orders.
+*   **Order Details:** Each order expands to show the date, total amount, and list of products purchased at that time (snapshot).
+*   **Status Tracking:** Orders have a status field (e.g., "Placed", "Shipped").
+
+### 2.7 Profile & Preferences
+*   **Dark Mode:** A global toggle that flips the `ThemeData`. This preference is saved locally (`SharedPreferences`).
+*   **Wishlist:** A persistent list of favorite items, stored in Firestore under the user's document.
+*   **Profile Editing:** Users can update their display name and phone number.
+
+### 2.8 Administrative Features
+*   **Product Creation:** Admin can input Name, Price, Description, Image URL, and Category.
+*   **Product Deletion:** Admin can remove obsolete items. This cascades to remove them from future search results (but preserves them in past order history records).
+
+---
+
+## 3. Technical Architecture & Design
+
+### 3.1 High-Level Architecture (MVVM + Provider)
+The application adheres to the **Model-View-ViewModel (MVVM)** pattern, adapted for Flutter using `Provider`.
+
+*   **Model (Data Layer):** 
+    *   Represented by Dart classes in `lib/models/`.
+    *   Responsible for defining the shape of data (e.g., `Product` class fields).
+    *   Handles JSON serialization/deserialization (`fromMap`, `toMap`).
+    *   *Pure Dart* - No UI code, no logic.
+
+*   **View (Presentation Layer):**
+    *   Represented by files in `lib/screens/` and `lib/widgets/`.
+    *   Responsible for *how* things look.
+    *   Passive components that listen to Providers.
+    *   Example: `ShopPage` listens to `ProductsProvider`. When the list changes, `ShopPage` rebuilds the grid.
+
+*   **ViewModel (Business Logic Layer):**
+    *   Represented by files in `lib/providers/`.
+    *   Responsible for *how* things work.
+    *   Holds the state (e.g., `List<Product> _items`).
+    *   Exposes methods to modify state (e.g., `addProduct()`).
+    *   Interacts with Services/Database.
+    *   Notifies listeners when state changes.
+
+### 3.2 State Management Strategy
+We use **MultiProvider** at the root of the app (`main.dart`). This "lifts state up" to the highest level, making it accessible everywhere.
+
+*   **`AuthProvider`:** Injected first. Used by potentially all other providers (e.g., Cart needs to know *who* owns it).
+*   **`ProxyProvider`:** (Conceptually used) - Providers that depend on other providers.
+*   **`ChangeNotifier`:** The base class for all providers. It gives us the magic `notifyListeners()` method.
+
+### 3.3 Directory Structure Analysis (File-by-File)
+
+**ROOT (`lib/`)**
+*   **`main.dart`**: The entry point.
+    *   *Responsibility:* Initializes Firebase, configures the Theme, and bootstraps the `MultiProvider` tree. Standardizes the `MaterialApp` routing.
+*   **`firebase_options.dart`**: Auto-generated by Firebase CLI. Contains API keys for Android/iOS.
+
+**`lib/auth/`** (Authentication Flows)
+*   **`login_screen.dart`**:
+    *   *UI:* TextFields for Email/Pass.
+    *   *Logic:* Calls `Provider.of<AuthProvider>.login()`. Handles exceptions (e.g., "User not found") and shows Snackbars.
+*   **`signup_screen.dart`**:
+    *   *UI:* Registration form.
+    *   *Logic:* Calls logic to create Auth Account + Firestore User Document.
+*   **`forgot_password_screen.dart`**:
+    *   *UI:* Email input.
+    *   *Logic:* Triggers Firebase password reset email.
+
+**`lib/models/`** (Data Definitions)
+*   **`product.dart`**: Defines `id`, `title`, `description`, `price`, `imageUrl`, `category`.
+*   **`cart.dart`**: Defines `CartItem` (subset of product + quantity).
+*   **`order.dart`**: Defines `OrderItem` (id, amount, products, datetime).
+*   **`http_exception.dart`**: Custom error class for handling API failures.
+
+**`lib/providers/`** (The Brains)
+*   **`auth_provider.dart`**:
+    *   *State:* `_user` (FirebaseUser).
+    *   *Methods:* `signUp`, `login`, `logout`, `autoLogin`.
+    *   *Streams:* Listens to `FirebaseAuth.instance.authStateChanges()`.
+*   **`products_provider.dart`**:
+    *   *State:* `List<Product> _items`.
+    *   *Methods:* `fetchAndSetProducts`, `addProduct`, `deleteProduct`, `findById`.
+    *   *Logic:* Handles the client-side Search and Sort filtering.
+*   **`cart_provider.dart`**:
+    *   *State:* `Map<String, CartItem> _items`.
+    *   *Methods:* `addItem`, `removeItem`, `removeSingleItem`, `clear`.
+    *   *Getter:* `totalAmount` (calculates the sum).
+    *   *Coupon:* `applyCoupon` (validates and stores active discount).
+*   **`orders_provider.dart`**:
+    *   *State:* `List<OrderItem> _orders`.
+    *   *Methods:* `addOrder` (pushes cart contents to Firestore), `fetchAndSetOrders`.
+*   **`theme_provider.dart`**:
+    *   *State:* `ThemeMode`.
+    *   *Methods:* `toggleTheme`. Persists preference to `SharedPreferences`.
+
+**`lib/screens/`** (The Face)
+*   **`shop_page.dart`**: The main landing. Contains the SearchBar, Filter Chips, and `ProductGrid`.
+*   **`product_details_page.dart`**: Full-screen view of an item. Shows product details and "Add to Cart" FAB.
+*   **`cart_page.dart`**: Lists added items. "Swipe-to-Dismiss" widgets implemented here.
+*   **`checkout_page.dart`**: Address form. Coupon Input. Payment Selection. Final "Place Order" button.
+*   **`orders_page.dart`**: History list. Uses `ExpansionTile` to show order contents.
+*   **`user_products_page.dart`**: (Admin) List of products with Edit/Delete buttons.
+*   **`edit_product_page.dart`**: (Admin) Form to creating/updating products.
+
+**`lib/services/`** (Utility Layer)
+*   **`seeder_service.dart`**: Logic to populate the DB with demo data (Coupons/Products) if empty.
+
+**`lib/widgets/`** ( reusable components )
+*   **`product_item.dart`**: The Grid Tile. Shows Image, Title, Price. Heart Icon (Wishlist). Cart Icon.
+*   **`badge.dart`**: The red notification dot on the Cart Icon showing item count.
+*   **`app_drawer.dart`**: The side menu (Hamburger menu) for navigation.
+
+---
+
+## 4. Database Schema & Data Modeling
+
+The backend uses **Cloud Firestore**, a NoSQL document database. This choices prioritizes read speed and scalability.
+
+### 4.1 Firestore Design Philosophy
+We use a **denormalized** data structure where appropriate. For example, when an order is placed, we copy the product details (title, price) *into* the order document.
+*   *Why?* If the product price changes later, the Order History must still show the *original* price paid.
+*   *Trade-off:* Slightly more storage usage, but significantly faster reads and correct historical data.
+
+### 4.2 Collection: `users`
+*   **ID:** `uid` (Matches Auth UID)
+*   **Fields:**
+    *   `email` (string): Indexable.
+    *   `displayName` (string): User's full name.
+    *   `phoneNumber` (string): Contact info.
+    *   `userRole` (string): 'customer' | 'admin'.
+    *   `wishlist` (array of strings): List of Product IDs.
+    *   `createdAt` (timestamp).
+
+### 4.3 Collection: `products`
+*   **ID:** Auto-generated UUID.
+*   **Fields:**
+    *   `title` (string): Searchable.
+    *   `description` (string): Long text.
+    *   `price` (number/double): For sorting.
+    *   `imageUrl` (string): URL to storage.
+    *   `category` (string): For filtering.
+    *   `isFavorite` (boolean): (Note: Usually user-specific, but simple implementation puts it here. Better: User sub-collection).
+
+### 4.4 Collection: `orders`
+*   **ID:** Auto-generated UUID.
+*   **Fields:**
+    *   `amount` (number): Final paid price.
+    *   `dateTime` (timestamp).
+    *   `userId` (string): Owner.
+    *   `products` (array of maps):
+        *   `id`: Original Product ID.
+        *   `title`: Frozen title.
+        *   `quantity`: int.
+        *   `price`: Frozen price.
+    *   `status` (string): 'Pending', 'Completed', 'Cancelled'.
+
+### 4.5 Collection: `coupons`
+*   **ID:** Auto-generated or custom string.
+*   **Fields:**
+    *   `code` (string): The lookup key (e.g., 'SAVE10').
+    *   `discountType` (string): 'percentage' or 'fixed'.
+    *   `value` (number): 10 or 50.
+    *   `expiryDate` (timestamp).
+    *   `isActive` (boolean).
+
+---
+
+## 5. Code Base Deep Dive (Logic & Algorithms)
+
+### 5.1 Authentication Logic (`AuthProvider`)
+The `AuthProvider` is the lifecycle manager.
+1.  **Stream Setup:** inside the constructor, we often listen to `FirebaseAuth.instance.authStateChanges()`. This stream emits a `User` object whenever the auth state changes (login, logout, token refresh).
+2.  **`signIn` Method:**
+    *   Input: `email`, `password`.
+    *   Process: `await _auth.signInWithEmailAndPassword(...)`.
+    *   Post-Process: Fetch `users/{uid}` from Firestore to load the Profile (Name, Wishlist).
+    *   Notification: `notifyListeners()` triggers the UI to switch from `AuthScreen` to `ShopScreen`.
+
+### 5.2 Product Fetching & Filtering (`ProductsProvider`)
+1.  **Fetching Strategy:**
+    *   We use `FirebaseFirestore.instance.collection('products').get()`.
+    *   We map the `QuerySnapshot` docs into `Product` dart objects.
+    *   This list is stored in memory (`_items`).
+2.  **Client-Side Search:**
+    *   We do not query Firestore for every keystroke (too expensive/$).
+    *   Instead, we create a subset list: `_items.where((prod) => prod.title.contains(query))`.
+    *   This allows for instant substring search without network latency.
+
+### 5.3 Cart Mathematics & Coupon Validation (`CartProvider`)
+1.  **Map Structure:** We use a `Map<String, CartItem>` where the key is the `productId`.
+    *   *Add Operation:* `if (map.containsKey(id)) { map[id].qty++; } else { map.putIfAbsent(id, new CartItem...); }`. Time Complexity: O(1).
+2.  **Total Calculation:**
+    *   Base Total: `_items.forEach((key, item) => total += item.price * item.quantity)`.
+    *   Discount Application:
+        ```dart
+        if (couponType == 'percentage') {
+           return baseTotal * (1 - (couponValue / 100));
+        } else {
+           return baseTotal - couponValue;
+        }
+        ```
+    *   Edge Case: Ensures total never goes below zero.
+
+### 5.4 Order Processing & Transaction Safety
+When "Place Order" is clicked:
+1.  **Loader:** UI shows `CircularProgressIndicator`.
+2.  **Batch Write:** Ideally, we would use a Firestore Batch to (1) Create Order and (2) Decrement Inventory (if inventory tracking exists).
+3.  **Local Cleanup:** `_cartProvider.clear()` is called to empty the cart immediately locally, giving instant feedback.
+4.  **Error Handling:** Wrapped in `try-catch`. If Firestore fails (offline/permissions), the Cart is *not* cleared, and the user is alerted.
+
+---
+
+## 6. Security, Privacy & Compliance
+
+### 6.1 Authentication Security
+*   **Passwords:** Never stored locally or on our DB. Handled entirely by Firebase Auth (Google's securely salted/hashed servers).
+*   **Transport:** All traffic is over HTTPS/SSL automatically.
+
+### 6.2 Firestore Security Rules (Production Ready)
+The following rules should be deployed to the Firebase Console:
+
+```javascript
+/* lib/security_rules/firestore.rules */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Function to check if user is signed in
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    // Function to check if user is admin
+    function isAdmin() {
+      return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userRole == 'admin';
+    }
+
+    // USERS: Users can read/write ONLY their own document
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // PRODUCTS: Public Read, Admin Write
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ORDERS: Users can create orders, but only read their own
+    match /orders/{orderId} {
+      allow create: if isSignedIn();
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update, delete: if false; // Orders are immutable
+    }
+
+    // COUPONS: Public Read (to validate), Admin Write
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
+```
+
+### 6.3 Data Privacy Considerations
+*   **User Data:** We only collect what is necessary (Name/Address) for shipping.
+*   **Deletion:** Users should have a "Delete Account" button (GDPR compliance) that triggers a Cloud Function to wipe their data from Auth and Firestore.
+
+---
+
+## 7. Operational Manual & User Guide
+
+### 7.1 Installation & Setup
+1.  **Prerequisites:** Android Phone (Ver 8.0+) or iOS Device (Ver 12+).
+2.  **Download:** Get the APK file or install via TestFlight.
+3.  On first launch, grant necessary storage permissions when prompted.
+
+### 7.2 New User Registration
+1.  Open App -> Splash Screen (Logo) appears.
+2.  On Login Screen, tap text **"Don't have an account? Sign Up"**.
+3.  **Form:**
+    *   *Email:* Enter your real email (e.g., `jane@doe.com`).
+    *   *Password:* Must be complex (e.g., `Secret123!`).
+    *   *Confirm Password:* Retype exact match.
+4.  Tap **REGISTER**.
+5.  *Feedback:* A loading spinner -> Success Toast -> Auto-redirect to Shop.
+
+### 7.3 The Shopping Experience
+*   **Browsing:** Scroll vertically to see products. High-quality images are cached.
+*   **Details:** Tap any product card.
+
+*   **Wishlisting:** Tap the Heart icon on the card top-right.
+    *   *View Wishlist:* Go to Profile Tab -> "My Wishlist".
+
+### 7.4 Checkout & Payments
+1.  Add items to Cart.
+2.  Tap Cart Icon (Top Right). Check items.
+3.  Tap **Total Button** / **Order Now**.
+4.  **Checkout Screen:**
+    *   *Shipping:* Enter full address.
+    *   *Coupon:* Enter `SAVE10`. Tap **Apply**. Validate the price drop.
+    *   *Payment:* Select **Credit Card**.
+5.  Tap **PLACE ORDER**.
+    *   Wait 2 seconds (Simulation).
+    *   See "Success" Dialog.
+    *   User is redirected to specific Order History page.
+
+### 7.5 Admin Panel Operations
+**Accessing the Hidden Panel:**
+1.  Log in.
+2.  Go to **Profile Page** (Bottom Right Tab).
+3.  Scroll to the very bottom.
+4.  Tap the list item **"Admin Panel"**.
+
+**Managing Inventory:**
+*   **Add Item:** Tap the `+` top right. Fill form.
+    *   *Note:* Image URL must be a valid direct link (ending in .jpg/.png) to render correctly.
+*   **Delete Item:** Swipe left on a product in the list -> Tap Red Trash Icon.
+    *   *Warning:* This is permanent.
+
+---
+
+## 8. Troubleshooting, Maintenance & FAQs
+
+### Common Issues
+**Q: "App hangs on the Splash Screen forever."**
+*   *Cause:* Firebase connectivity issue.
+*   *Fix:* Check internet connection. If strictly using Emulator, ensure Google Play Services are updated.
+
+**Q: "I get 'Permission Denied' when saving an order."**
+*   *Cause:* You might be logged out or your account was banned (if RBAC is active).
+*   *Fix:* Go to Profile -> Logout -> Log in again to refresh token.
+
+**Q: "Images are broken / showing error icon."**
+*   *Cause:* The URL provided in the Admin Panel is dead or is 403 Forbidden (hotlink protection).
+*   *Fix:* Use stable image hosts like Imgur or AWS S3.
+
+
+*   *Fix:* Minimize the app (Home button) and send the test message again.
+
+### Maintenance Mode
+To enable "Maintenance Mode" (lock users out):
+1.  In Firestore, create a collection `settings` -> doc `config`.
+2.  Field `maintenance_mode: true`.
+3.  The App (via `main.dart` stream listener) will detect this and show a full-screen "Under Maintenance" widget (Feature to be implemented in V1.1).
+
+---
+
+## 9. Future Roadmap & Scalability
+
+### Short Term (v1.1)
+*   **Real Payments:** Integrate Stripe SDK. Replace the `Future.delayed` mock with real `StripePayment.confirmPayment()`.
+*   **Pagination:** Implement infinite scrolling (`limit(20)`) to handle thousands of products.
+*   **Caching:** Enhance `cached_network_image` strategies for offline browsing.
+
+### Long Term (v2.0)
+*   **Web Support:** Flutter Web build.
+*   **Analytics:** Firebase Analytics dashboard for User Engagement tracking.
+*   **AI Recommendations:** "Users who bought X also bought Y" logic using Cloud Functions.
+
+---
+
+## 10. Glossary of Technical Terms
+*   **Widget:** The basic building block of Flutter UI. Everything is a widget.
+*   **Provider:** A wrapper around `InheritedWidget` to make state management easier.
+*   **Firestore:** A flexible, scalable database for mobile, web, and server development from Firebase and Google Cloud Platform.
+*   **Collection/Document:** The NoSQL equivalent of Table/Row.
+*   **Seeder:** A script or function that populates a database with initial data.
+*   **CRUD:** Create, Read, Update, Delete. The four basic functions of persistent storage.
+*   **RBAC:** Role-Based Access Control. Restricting system access to authorized users.
+*   **FCM:** Firebase Cloud Messaging. A cross-platform messaging solution that lets you reliably deliver messages at no cost.
+*   **MVVM:** Model-View-ViewModel. An architectural pattern used effectively in Flutter to separate UI logic from business logic.
+
+---
+**End of Document**
+*© 2025 Group 10. All Rights Reserved.*
+
+---
+
+## 11. Project Contributors & Works
+
+This project is a collaborative effort by Group 10. Below is the detailed breakdown of responsibilities and contributions.
+
+### 11.1 Member 1: Core Infrastructure
+**Primary Responsibility:** Application Backbone & Data Layer
+*   **Project Initialization:** Set up the Flutter environment, Android/iOS runner configurations, and Firebase connection (`google-services.json`).
+*   **Authentication System:** Implemented the full Auth lifecycle (Registration, Login, Email Verification) and `AuthProvider`.
+*   **Database Design:** Created the initial Firestore schema for Users, Products, and Orders.
+*   **Shopping Basics:** Built the `ProductGrid`, `CartProvider` (Add/Remove), and the initial Checkout form logic.
+
+### 11.2 Member 2: UX Enhancements & Advanced Features
+**Primary Responsibility:** Frontend Polish, Engagement & Advanced Logic
+*   **Search & Sort:** Developed the client-side search algorithm and sorting capability (Price Low-to-High).
+*   **Dark Mode:** Implemented `ThemeProvider`, persisting user preference locally.
+*   **Engagement:** Created the `Wishlist` system for saving favorite products.
+*   **Coupons:** Designed the `Coupon` data model and the validation logic inside `CartProvider`.
+
+*   **Payment Simulation:** Built the Mock Payment Gateway UI (Credit Card/Mobile Money) with simulated latency.
+
+---
+
+## 12. Environment & Build Configuration
+
+To deploy or build this project successfully, ensure your environment matches the following specifications (based on `pubspec.yaml`).
+
+### 12.1 Flutter & Dart Version
+*   **SDK Constraint:** `sdk: ^3.9.2` (Ensures Dart 3 features like Records and Pattern Matching are available).
+*   **Flutter Channel:** Stable.
+
+### 12.2 Key Dependencies & Versions
+| Package | Version | Justification |
+| :--- | :--- | :--- |
+| **provider** | `^6.1.5` | Lightweight Dependency Injection and State Management. |
+| **firebase_core** | `^4.2.1` | Required for initializing Firebase App. |
+| **firebase_auth** | `^6.1.2` | Handles Identity Platform (Sign-in methods). |
+| **cloud_firestore** | `^6.1.0` | Cloud database client. |
+| **cached_network_image** | `^3.3.0` | essential for caching product images to disk to save bandwidth. |
+| **permission_handler** | `^11.3` | Manages runtime permissions for storage on Android 13+. |
+
+### 12.3 Android configuration
+*   **minSdkVersion:** 21 (Android 5.0 Lollipop) - Required by Firebase Authentication.
+*   **targetSdkVersion:** 33 (Android 13 Tiramisu).
+*   **Permissions:** Storage permissions are required for caching product images.
+
+---
+
+## 13. Testing & Quality Assurance
+
+### 13.1 Integration Testing Strategy
+The project includes a basic integration test suite located at `test/full_app_test.dart`.
+*   **Scope:** Verifies that the app widget tree builds correctly and that Providers are injected at the root level.
+*   **Command:** `flutter test test/full_app_test.dart`
+*   **Key Test: `App launches and displays Splash Screen`:** Ensures no crash on startup.
+*   **Key Test: `Providers are injected`:** Uses `WidgetTester` to verify that `Provider.of<AuthProvider>(context)` does not throw a "ProviderNotFound" exception.
+
+### 13.2 Manual Verification Checklist (QA)
+Before release, the following manual tests were performed:
+1.  **Auth Flow:** Registered a new user -> Clicked Link in Real Email -> Logged in successfully.
+2.  **Order Math:** Added 2 items ($100 each). Applied 10% Coupon. Verified Total = $180.
+3.  **Persistence:** Closed app while logged in -> Reopened -> Still logged in (Splash -> Shop).
+4.  **Admin:** Added product "TestItem". Checked other device -> "TestItem" appeared instantly (Real-time sync).
+
+---
+**End of Document**

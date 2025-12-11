@@ -16,6 +16,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isObscure = true;
+  bool _isLoading = false; // Add loading state
 
   @override
   Widget build(BuildContext context) {
@@ -178,7 +179,8 @@ class _SignupScreenState extends State<SignupScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: _isLoading ? null : () async {
+                    // Disable button when loading
                     final name = _nameController.text.trim();
                     final email = _emailController.text.trim();
                     final phone = _phoneController.text.trim();
@@ -197,13 +199,33 @@ class _SignupScreenState extends State<SignupScreen> {
                       return;
                     }
 
+                    // Check password strength
+                    if (password.length < 6) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Password must be at least 6 characters"),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
+                    setState(() {
+                      _isLoading = true; // Show loading state
+                    });
+
                     try {
-                      await Provider.of<AuthProvider>(
+                      await Provider.of<AuthManager>(
                         context,
                         listen: false,
                       ).signUp(email, password, name, phone);
 
                       if (context.mounted) {
+                        // Reset loading state
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        
                         showDialog(
                           context: context,
                           barrierDismissible: false,
@@ -226,6 +248,11 @@ class _SignupScreenState extends State<SignupScreen> {
                       }
                     } catch (e) {
                       if (context.mounted) {
+                        // Reset loading state
+                        setState(() {
+                          _isLoading = false;
+                        });
+                        
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(e.toString()),
@@ -242,14 +269,23 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    "Sign Up",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 24),
@@ -281,5 +317,14 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class AuthProvider with ChangeNotifier {
+class AuthManager with ChangeNotifier {  // Renamed from AuthProvider to AuthManager
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   User? _user;
@@ -11,7 +11,7 @@ class AuthProvider with ChangeNotifier {
   User? get user => _user;
   Map<String, dynamic>? get userData => _userData;
 
-  AuthProvider() {
+  AuthManager() {  // Constructor name updated
     _user = _auth.currentUser;
     _fetchUserData();
     _auth.authStateChanges().listen((User? user) {
@@ -44,8 +44,17 @@ class AuthProvider with ChangeNotifier {
     String phoneNumber,
   ) async {
     try {
+      debugPrint('[AuthManager] Starting signup for email: $email');
+      
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
+
+      // Validate user was created
+      if (userCredential.user == null) {
+        throw 'Failed to create user account. Please try again.';
+      }
+
+      debugPrint('[AuthManager] User created with UID: ${userCredential.user!.uid}');
 
       // Save user data to Firestore
       await _firestore.collection('users').doc(userCredential.user!.uid).set({
@@ -55,18 +64,66 @@ class AuthProvider with ChangeNotifier {
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      debugPrint('[AuthManager] User document saved to Firestore');
+
       // Send verification email
       await userCredential.user!.sendEmailVerification();
 
-      // Sign out immediately so they can't access the app until verified
-      await _auth.signOut();
-      _user = null;
-      _userData = null;
+      debugPrint('[AuthManager] Verification email sent to $email');
+
+      // For development/testing: Keep user logged in so they can use the app immediately
+      // In production, you might want to enforce email verification
+      // await _auth.signOut();
+      // _user = null;
+      // _userData = null;
+      // notifyListeners();
+      
+      // Instead, fetch user data and keep them logged in
+      await _fetchUserData();
+      _user = userCredential.user;
       notifyListeners();
     } on FirebaseAuthException catch (e) {
-      throw e.message ?? 'An error occurred during sign up.';
+      debugPrint('[AuthManager] FirebaseAuthException caught: ${e.code} - ${e.message}');
+      
+      // Handle specific Firebase Auth errors
+      String errorMessage = 'An error occurred during sign up.';
+      
+      switch (e.code) {
+        case 'email-already-in-use':
+          errorMessage = 'This email is already registered. Please use a different email.';
+          break;
+        case 'invalid-email':
+          errorMessage = 'The email address is invalid. Please check and try again.';
+          break;
+        case 'operation-not-allowed':
+          errorMessage = 'Email/password accounts are not enabled. Please contact support.';
+          break;
+        case 'weak-password':
+          errorMessage = 'The password is too weak. Please use a stronger password.';
+          break;
+        case 'too-many-requests':
+          errorMessage = 'Too many attempts. Please try again later.';
+          break;
+        case 'captcha-check-failed':
+          errorMessage = 'Security verification failed. Please check your internet connection and try again.';
+          break;
+        case 'configuration-not-found':
+          errorMessage = 'App security configuration error. This issue is being resolved. Please try again in a moment.';
+          break;
+        default:
+          errorMessage = e.message ?? errorMessage;
+      }
+      
+      debugPrint('[AuthManager] Error message: $errorMessage');
+      throw errorMessage;
     } catch (e) {
-      throw 'An error occurred during sign up.';
+      debugPrint('[AuthManager] Non-Firebase error: $e');
+      // Handle any other errors
+      String errorMessage = 'An unexpected error occurred during sign up.';
+      if (e.toString().contains('CONFIGURATION_NOT_FOUND')) {
+        errorMessage = 'Security configuration error. Please try again or contact support.';
+      }
+      throw errorMessage;
     }
   }
 
@@ -78,11 +135,33 @@ class AuthProvider with ChangeNotifier {
       );
 
       if (!userCredential.user!.emailVerified) {
-        await _auth.signOut();
-        throw 'Email not verified. Please check your inbox.';
+        // For development/testing: Allow login even if email is not verified
+        // In production, you might want to enforce email verification
+        debugPrint('[AuthManager] Warning: Email not verified, but allowing login for testing');
+        // await _auth.signOut();
+        // throw 'Email not verified. Please check your inbox.';
       }
     } on FirebaseAuthException catch (e) {
-      throw e.message ?? 'An error occurred during sign in.';
+      String errorMessage = 'An error occurred during sign in.';
+      
+      switch (e.code) {
+        case 'invalid-email':
+          errorMessage = 'Invalid email address.';
+          break;
+        case 'user-disabled':
+          errorMessage = 'This account has been disabled. Please contact support.';
+          break;
+        case 'user-not-found':
+          errorMessage = 'No account found with this email. Please check your email or sign up.';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Incorrect password. Please try again.';
+          break;
+        default:
+          errorMessage = e.message ?? errorMessage;
+      }
+      
+      throw errorMessage;
     } catch (e) {
       throw e.toString();
     }
@@ -143,13 +222,34 @@ class AuthProvider with ChangeNotifier {
       if (!userCredential.user!.emailVerified) {
         await userCredential.user!.sendEmailVerification();
         await _auth.signOut();
+        debugPrint('[AuthManager] Verification email resent successfully');
       } else {
         // Already verified
         await _auth.signOut();
+        debugPrint('[AuthManager] Email is already verified');
         throw 'Email is already verified.';
       }
     } on FirebaseAuthException catch (e) {
-      throw e.message ?? 'Failed to resend verification email.';
+      String errorMessage = 'Failed to resend verification email.';
+      
+      switch (e.code) {
+        case 'invalid-email':
+          errorMessage = 'Invalid email address.';
+          break;
+        case 'user-disabled':
+          errorMessage = 'This account has been disabled.';
+          break;
+        case 'user-not-found':
+          errorMessage = 'No account found with this email.';
+          break;
+        case 'wrong-password':
+          errorMessage = 'Incorrect password.';
+          break;
+        default:
+          errorMessage = e.message ?? errorMessage;
+      }
+      
+      throw errorMessage;
     }
   }
 
@@ -157,7 +257,20 @@ class AuthProvider with ChangeNotifier {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      throw e.message ?? 'An error occurred during password reset.';
+      String errorMessage = 'An error occurred during password reset.';
+      
+      switch (e.code) {
+        case 'invalid-email':
+          errorMessage = 'Invalid email address.';
+          break;
+        case 'user-not-found':
+          errorMessage = 'No account found with this email.';
+          break;
+        default:
+          errorMessage = e.message ?? errorMessage;
+      }
+      
+      throw errorMessage;
     } catch (e) {
       throw 'An error occurred during password reset.';
     }

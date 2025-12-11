@@ -6,6 +6,7 @@ import 'package:minimart/models/product.dart';
 import 'package:minimart/providers/cart_provider.dart';
 import 'package:minimart/theme/app_colors.dart';
 import 'package:minimart/screens/product_details_page.dart';
+import 'package:minimart/providers/wishlist_provider.dart';
 
 class ProductGridItem extends StatelessWidget {
   final Product product;
@@ -38,23 +39,59 @@ class ProductGridItem extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(15),
-                ),
-                child: CachedNetworkImage(
-                  imageUrl: product.imageUrl,
-                  cacheManager: ImageCacheService.customCacheManager,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  memCacheWidth: 400,
-                  fadeInDuration: Duration.zero,
-                  placeholder: (context, url) =>
-                      Container(color: Colors.grey[200]),
-                  errorWidget: (context, url, error) => const Center(
-                    child: Icon(Icons.broken_image, color: Colors.grey),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(15),
+                    ),
+                    child: CachedNetworkImage(
+                      imageUrl: product.imageUrl,
+                      cacheManager: ImageCacheService.customCacheManager,
+                      fit: BoxFit.cover,
+                      // width: double.infinity, // Not needed with Positioned.fill or StackFit.expand
+                      memCacheWidth: 400,
+                      fadeInDuration: Duration.zero,
+                      placeholder: (context, url) =>
+                          Container(color: Colors.grey[200]),
+                      errorWidget: (context, url, error) => const Center(
+                        child: Icon(Icons.broken_image, color: Colors.grey),
+                      ),
+                    ),
                   ),
-                ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Consumer<WishlistProvider>(
+                      builder: (context, wishlist, child) {
+                        final isFavorite = wishlist.isInWishlist(product.id);
+                        return GestureDetector(
+                          onTap: () => wishlist.toggleWishlist(product.id),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isFavorite ? Icons.favorite : Icons.favorite_border,
+                              size: 18,
+                              color: isFavorite ? const Color(0xFFFF6B6B) : Colors.grey,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(

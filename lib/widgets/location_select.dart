@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:minimart/providers/auth_provider.dart';
+import 'package:minimart/providers/auth_provider.dart'; // This imports the file, but we use AuthManager
 import 'package:minimart/theme/app_colors.dart';
 import 'package:minimart/widgets/snackbar.dart';
 
@@ -44,7 +44,7 @@ class _LocationSelectState extends State<LocationSelect> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final authProvider = Provider.of<AuthManager>(context, listen: false); // Changed from AuthProvider to AuthManager
       if (authProvider.userData != null &&
           authProvider.userData!['location'] != null) {
         setState(() {
@@ -56,7 +56,7 @@ class _LocationSelectState extends State<LocationSelect> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<AuthManager>(context); // Changed from AuthProvider to AuthManager
     // Update local state if provider has a different location (e.g. from initial load)
     if (authProvider.userData != null &&
         authProvider.userData!['location'] != null &&
@@ -71,7 +71,7 @@ class _LocationSelectState extends State<LocationSelect> {
         setState(() {
           _selectedLocation = newValue;
         });
-        Provider.of<AuthProvider>(
+        Provider.of<AuthManager>( // Changed from AuthProvider to AuthManager
           context,
           listen: false,
         ).updateLocation(newValue);

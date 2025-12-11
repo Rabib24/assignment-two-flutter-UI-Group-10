@@ -14,6 +14,10 @@ class ShopPage extends StatefulWidget {
 }
 
 class _ShopPageState extends State<ShopPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = "";
+  String _sortBy = 'default'; // default, price_asc, price_desc
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +26,17 @@ class _ShopPageState extends State<ShopPage> {
         Provider.of<ProductsProvider>(context, listen: false).fetchProducts();
       }
     });
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -29,219 +44,258 @@ class _ShopPageState extends State<ShopPage> {
     return Consumer<ProductsProvider>(
       builder: (context, productsData, child) {
         final products = productsData.products;
-        return RefreshIndicator(
-          onRefresh: () => Provider.of<ProductsProvider>(
-            context,
-            listen: false,
-          ).fetchProducts(),
-          child: ListView(
-            padding: const EdgeInsets.all(15),
-            children: [
-              SizedBox(
-                height: 180,
-                child: PageView(
-                  children: [
-                    // Banner 1
-                    Container(
-                      margin: const EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF6C5CE7), Color(0xFFA29BFE)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF6C5CE7,
-                            ).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            right: -20,
-                            bottom: -20,
-                            child: Icon(
-                              Icons.shopping_bag_outlined,
-                              size: 140,
-                              color: Colors.white.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.all(24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Summer Sale",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+        
+        // Filter and Sort Logic
+        List<Product> filteredProducts = products;
+        
+        if (_searchQuery.isNotEmpty) {
+          filteredProducts = products.where((p) => 
+            p.name.toLowerCase().contains(_searchQuery.toLowerCase())
+          ).toList();
+        }
+
+        if (_sortBy == 'price_asc') {
+          filteredProducts.sort((a, b) => a.price.compareTo(b.price));
+        } else if (_sortBy == 'price_desc') {
+          filteredProducts.sort((a, b) => b.price.compareTo(a.price));
+        }
+
+        final bool isSearchingOrSorting = _searchQuery.isNotEmpty || _sortBy != 'default';
+
+        return Scaffold(
+           body: RefreshIndicator(
+            onRefresh: () => Provider.of<ProductsProvider>(
+              context,
+              listen: false,
+            ).fetchProducts(),
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        // Search Bar & Sort Row
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                  hintText: "Search products...",
+                                  prefixIcon: const Icon(Icons.search),
+                                  filled: true,
+                                  fillColor: AppColors.background,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide.none,
                                   ),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                                 ),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Up to 50% OFF",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: PopupMenuButton<String>(
+                                icon: const Icon(Icons.sort),
+                                onSelected: (value) {
+                                  setState(() {
+                                    _sortBy = value;
+                                  });
+                                },
+                                itemBuilder: (context) => [
+                                  const PopupMenuItem(
+                                    value: 'default',
+                                    child: Text('Default'),
                                   ),
+                                  const PopupMenuItem(
+                                    value: 'price_asc',
+                                    child: Text('Price: Low to High'),
+                                  ),
+                                  const PopupMenuItem(
+                                    value: 'price_desc',
+                                    child: Text('Price: High to Low'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        
+                        if (!isSearchingOrSorting) ...[
+                          const SizedBox(height: 20),
+                          // Banners logic
+                           SizedBox(
+                            height: 180,
+                            child: PageView(
+                              children: [
+                                _buildBanner(
+                                  colors: [const Color(0xFF6C5CE7), const Color(0xFFA29BFE)],
+                                  icon: Icons.shopping_bag_outlined,
+                                  title: "Summer Sale",
+                                  subtitle: "Up to 50% OFF",
+                                ),
+                                _buildBanner(
+                                  colors: [const Color(0xFFFF7675), const Color(0xFFFF9F43)],
+                                  icon: Icons.local_offer_outlined,
+                                  title: "New Arrivals",
+                                  subtitle: "Check out the latest trends",
+                                ),
+                                _buildBanner(
+                                  colors: [const Color(0xFF00B894), const Color(0xFF55EFC4)],
+                                  icon: Icons.eco_outlined,
+                                  title: "Fresh & Organic",
+                                  subtitle: "Straight from the farm",
                                 ),
                               ],
                             ),
                           ),
                         ],
-                      ),
+                      ],
                     ),
-                    // Banner 2
-                    Container(
-                      margin: const EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFF7675), Color(0xFFFF9F43)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFFFF7675,
-                            ).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            right: -20,
-                            bottom: -20,
-                            child: Icon(
-                              Icons.local_offer_outlined,
-                              size: 140,
-                              color: Colors.white.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.all(24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "New Arrivals",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Check out the latest trends",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Banner 3
-                    Container(
-                      margin: const EdgeInsets.only(right: 10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF00B894), Color(0xFF55EFC4)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF00B894,
-                            ).withValues(alpha: 0.3),
-                            blurRadius: 10,
-                            offset: const Offset(0, 5),
-                          ),
-                        ],
-                      ),
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            right: -20,
-                            bottom: -20,
-                            child: Icon(
-                              Icons.eco_outlined,
-                              size: 140,
-                              color: Colors.white.withValues(alpha: 0.2),
-                            ),
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.all(24.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Fresh & Organic",
-                                  style: TextStyle(
-                                    fontSize: 28,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Straight from the farm",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.white70,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 24),
-              if (products.isEmpty)
-                const Center(child: CircularProgressIndicator())
-              else
-                ..._buildCategorySections(context, products),
-            ],
+
+                if (isSearchingOrSorting)
+                   SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    sliver: filteredProducts.isEmpty 
+                      ? const SliverToBoxAdapter(
+                          child: Center(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 50.0),
+                              child: Text("No products found"),
+                            ),
+                          ),
+                        )
+                      : SliverGrid(
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.75,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              return ProductGridItem(product: filteredProducts[index]);
+                            },
+                            childCount: filteredProducts.length,
+                          ),
+                        ),
+                  )
+                else if (products.isEmpty)
+                  const SliverToBoxAdapter(
+                     child: Center(child: CircularProgressIndicator()),
+                  )
+                else
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                         // Re-using the category grouping logic adapted for SliverList
+                         // Ideally we pre-calculate sections. For simplicity, we can just use a column in an adapter or restructure.
+                         // To keep it simple and clean with the previous design, let's just stick to the previous column-based layout inside a SliverToBoxAdapter 
+                         // or use a helper that returns a list of widgets.
+                         
+                         // BUT SliverList needs index.
+                         // Let's just put the existing category logic into a single SliverToBoxAdapter for the default view
+                         // or use the ListView inside the RefreshIndicator body if not needing slivers.
+                         // However, I switched to CustomScrollView to handle the scrolling of search bar + content together nicely.
+                        return null; 
+                      },
+                      childCount: 0, 
+                    ),
+                  ),
+                  
+                  // Fixing the structure for Default View
+                 if (!isSearchingOrSorting && products.isNotEmpty)
+                    SliverToBoxAdapter(
+                      child: Column(
+                        children: _buildCategorySections(context, products),
+                      ),
+                    ),
+              ],
+            ),
           ),
         );
       },
     );
   }
 
+  Widget _buildBanner({
+    required List<Color> colors,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+      return Container(
+        margin: const EdgeInsets.only(right: 10),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: colors,
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: colors[0].withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              right: -20,
+              bottom: -20,
+              child: Icon(
+                icon,
+                size: 140,
+                color: Colors.white.withValues(alpha: 0.2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.white70,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+  }
+
   List<Widget> _buildCategorySections(
     BuildContext context,
-    List<dynamic> products,
+    List<Product> products,
   ) {
     // Group products by category
-    final Map<String, List<dynamic>> productsByCategory = {};
+    final Map<String, List<Product>> productsByCategory = {};
     for (var product in products) {
       if (!productsByCategory.containsKey(product.category)) {
         productsByCategory[product.category] = [];
@@ -259,7 +313,7 @@ class _ShopPageState extends State<ShopPage> {
         children: [
           const SizedBox(height: 24),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0), // Fixed padding to match Search bar
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -277,7 +331,7 @@ class _ShopPageState extends State<ShopPage> {
                       MaterialPageRoute(
                         builder: (ctx) => CategoryProductsPage(
                           category: category,
-                          products: categoryProducts.cast<Product>(),
+                          products: categoryProducts,
                         ),
                       ),
                     );
@@ -289,14 +343,15 @@ class _ShopPageState extends State<ShopPage> {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 280, // Adjust height as needed for ProductGridItem
+            height: 280, 
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16), // Padding for first item
               itemCount: categoryProducts.length,
               itemBuilder: (context, index) {
                 final product = categoryProducts[index];
                 return Container(
-                  width: 180, // Width of each item
+                  width: 180, 
                   margin: const EdgeInsets.only(right: 16),
                   child: ProductGridItem(product: product),
                 );

@@ -1,0 +1,103 @@
+﻿Final Project Document 
+
+Tech Stack: Flutter + Firebase + Provider
+Restrictions:
+* No file uploads
+* No push notifications
+* No platform-specific features
+* Uses only Firebase Firestore (no storage)
+* Beginner-friendly CRUD + simple UI
+* Phone-only, no backend server
+
+
+________________
+
+
+Project List
+Project ID
+	Name
+	P004
+	E-commerce Mini Shopping Cart (Unsplash Images)
+	
+
+________________
+________________
+
+
+P004 — E-commerce Mini Shopping Cart (Unsplash Images)
+Project Story
+A tiny online store app with product browsing and cart management. All product images come from preset Unsplash URLs (no file upload).
+
+
+________________
+
+
+Functionalities
+1. Product Catalog Load from Firebase Each product has name, price, category, image URL
+2. Product Details Larger image Name, price, description Add to cart
+3. Cart Screen Increase/decrease quantity Remove item Auto-update totals
+4. Order Placement Place order with customer details (name, phone, address)
+5. Order confirmation screen Order with status (Order placed) 
+6. Order ID generation (Firebase Document ID)
+7. Order History View all placed orders Filter orders by status View order details
+8. Checkout Save order summary in Firebase Clear cart when done
+
+
+________________
+
+
+Firebase Structure
+/products
+  /productId
+    name
+    price
+    category
+    imageUrl
+
+
+/orders
+  /orderId
+    items
+    total
+    date
+    status
+    customerName
+    customerPhone
+    customerAddress
+    orderId
+
+________________
+
+
+P005 — Simple Expense Calculator
+Project Story
+A lightweight expense tracker app. Users can add expenses, view totals, filter by category, and manage their expense entries.
+
+
+________________
+
+
+Functionalities
+1. Add Expense Name Amount Date Category Description (optional)
+2. Expense List all entries Swipe to delete Edit expense entries
+3. Total Expense Auto-calculated total from all expenses Category-wise total display
+4. Category Filter expenses by category Default categories: Food, Transport, Entertainment, Shopping, Bills, Other
+5. Search Expenses by name
+6. Sort Expenses Sort by date (newest first) Sort by amount (high to low)
+7. Firebase Sync All expenses stored in Firestore Real-time sync across devices
+
+
+________________
+
+
+Firebase Structure
+/expenses
+  /expenseId
+    name
+    amount
+    date
+    category
+    description
+    createdAt
+
+________________
