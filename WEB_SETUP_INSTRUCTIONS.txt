@@ -1,0 +1,93 @@
+# Flutter Web Setup Instructions
+
+This document provides step-by-step instructions to configure and run your Flutter application on the web platform.
+
+## Prerequisites
+
+1. Ensure you have Flutter installed (version 3.9.2 or higher as specified in pubspec.yaml)
+2. Ensure you have a modern web browser installed (Chrome, Firefox, Edge, Safari)
+
+## Steps to Enable Web Support
+
+### 1. Enable Web Support in Flutter
+
+Open a terminal/command prompt in your project directory and run:
+```
+flutter config --enable-web
+```
+
+### 2. Add Web Support to Existing Project
+
+Run the following command to add web support to your existing Flutter project:
+```
+flutter create .
+```
+This command will add any missing platform support files while preserving your existing code.
+
+### 3. Verify Web Support
+
+Check that web is listed as a supported platform:
+```
+flutter devices
+```
+You should see "Chrome" or "Web Server" listed as available devices.
+
+### 4. Get Packages
+
+Ensure all packages are properly fetched:
+```
+flutter pub get
+```
+
+### 5. Configure Firebase for Web (Optional but Recommended)
+
+If you have a Firebase project, you should configure it for web support:
+```
+flutterfire configure
+```
+Follow the prompts to select your Firebase project and enable web support.
+
+If you don't have a Firebase project, you can skip this step, but note that Firebase features won't work properly until configured.
+
+## Running the Application on Web
+
+### Option 1: Run on Chrome (Recommended for Development)
+```
+flutter run -d chrome
+```
+
+### Option 2: Run on Web Server (for other browsers)
+```
+flutter run -d web-server
+```
+
+## Building for Web Deployment
+
+To build your application for web deployment:
+```
+flutter build web
+```
+
+The built files will be located in the `build/web` directory.
+
+## Troubleshooting
+
+### Common Issues:
+
+1. **Blank Screen**: If you see a blank screen, check the browser console for errors.
+2. **CORS Errors**: If using Firebase, ensure your Firebase rules allow web access.
+3. **Missing Assets**: Ensure all assets are properly declared in pubspec.yaml.
+
+### Debugging Tips:
+
+1. Use browser developer tools to inspect the console and network requests.
+2. Check that all required files (index.html, manifest.json) are present in the web directory.
+3. Ensure platform-specific code is properly handled (as we've done with permissions).
+
+## Additional Notes
+
+1. The application has been modified to conditionally request permissions only on mobile platforms.
+2. Firebase configuration has been updated to support web platform detection.
+3. All required web configuration files (index.html, manifest.json) have been created.
+4. Web support has been successfully added to the project using `flutter create .` command.
+5. The project has been successfully built for web deployment.

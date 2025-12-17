@@ -1,0 +1,32 @@
+# Flutter Project Dependencies
+# This file lists all the required packages and their versions for the MiniMart Flutter project
+
+## Core Flutter Dependencies
+flutter sdk: flutter
+
+## Production Dependencies
+cupertino_icons: ^1.0.8
+provider: ^6.1.5+1
+firebase_core: ^4.2.1
+firebase_auth: ^6.1.2
+cloud_firestore: ^6.1.0
+intl: ^0.20.2
+cached_network_image: ^3.3.0
+permission_handler: ^11.3.1
+flutter_cache_manager: ^3.3.1
+
+## Development Dependencies
+flutter_test:
+  sdk: flutter
+flutter_lints: ^5.0.0
+
+## Setup Instructions
+# 1. Make sure you have Flutter installed (version 3.9.2 or higher)
+# 2. Run 'flutter pub get' to install all dependencies
+# 3. For Firebase setup, run 'flutterfire configure' to generate firebase_options.dart
+# 4. Make sure you have the google-services.json file in android/app/ directory
+
+## Additional Setup Notes
+# - The firebase_options.dart file needs to be properly configured with your Firebase project credentials
+# - For iOS builds, you'll also need the GoogleService-Info.plist file
+# - Make sure to enable required Firebase services (Authentication, Firestore) in the Firebase Console

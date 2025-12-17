@@ -1,0 +1,28 @@
+# Extra Features
+
+## Authentication
+1. Email Verification: Users must verify email before full access.
+2. Profile: Editable name and phone number.
+
+## UI/UX
+1. Splash Screen: Intro screen on startup.
+2. Custom Design: Gradient app bar and colored buttons.
+3. Bottom Navigation: Easy switching between Home, Cart, and Profile.
+4. Drawer Menu: Additional navigation options.
+5. Location Selector: Predefined list of locations.
+6. Feedback: Snackbars show success/error messages.
+7. Loading States: Indicators shown during data fetch.
+8. Interactive Cart: Swipe to remove locally (optional) or confirmation dialogs.
+
+## Technical Features
+1. State Management: Uses Provider for app-wide state.
+2. Data Sync: Real-time updates from Firebase.
+3. Image Caching: Optimized image loading.
+4. Input Validation: Ensures correct data entry (email, phone).
+5. Error Handling: User-friendly error messages.
+
+## Security
+1. Secure Inputs: Password visibility toggle.
+2. Data Privacy: Users only see their own orders.
+
+This list highlights the value-added features that improve the app beyond the basic assignment.

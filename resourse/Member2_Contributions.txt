@@ -1,0 +1,53 @@
+# Member 2 Contributions Report / Handover Note
+
+## Overview
+This document outlines the features and modules implemented by Member 2. These contributions cover **Essential UX**, **User Engagement**, and **Advanced Features** (Phases 1-3).
+
+## 1. Essential UX Enhancements
+- **Search Functionality:**
+  - Implemented real-time product search in `ShopPage`.
+  - Added search bar widget with filtering logic.
+- **Sorting System:**
+  - Added ability to sort products by Price (Low to High / High to Low).
+  - Integrated `PopupMenuButton` for sort options.
+- **Dark Mode:**
+  - Performed full app styling for Dark Theme support.
+  - created `ThemeProvider` for state persistence.
+  - Added Dark Mode toggle switch in `ProfilePage`.
+- **Wishlist System:**
+  - Created `WishlistProvider` to manage favorites in Firestore (`users/{uid}/wishlist`).
+  - Built `WishlistPage` to display saved items.
+  - Added interactive "Heart" icon to product cards.
+
+## 2. User Engagement Features
+- **Product Reviews:**
+  - Designed `Review` model and Firestore sub-collection structure (`products/{id}/reviews`).
+  - Developed `ProductReviews` widget for `ProductDetailsPage`.
+  - Implemented "Write a Review" dialog with star rating and comment input.
+- **Coupon System:**
+  - Created `Coupon` model (supporting Percentage and Fixed discounts).
+  - Developed `SeederService` to auto-populate test coupons (`SAVE10`, `WELCOME20`).
+  - Integrated Coupon input field and discount calculation in `CartProvider` and `CheckoutPage`.
+
+## 3. Advanced Features
+- **Push Notifications:**
+  - Integrated `firebase_messaging` and `flutter_local_notifications`.
+  - Created `NotificationService` to handle foreground and background messages.
+  - Configured Android permissions and initialization in `main.dart`.
+- **Payment Gateway Simulation:**
+  - Enhanced `CheckoutPage` with Payment Method selection.
+  - Supported options: **Cash on Delivery**, **Credit/Debit Card**, **Mobile Money**.
+  - Implemented Mock Payment Processing (simulated delay) for non-COD methods.
+
+## 4. Documentation & Maintenance
+- **Refactoring:** Cleaned up provider logic and separated UI widgets.
+- **Documentation:** Updated `Project_Summary_and_Manual.txt` with new feature instructions.
+- **Tracking:** Updated `todo.txt` to reflect completed status of assigned tasks.
+
+---
+
+## Handover Notes for Member 3
+- All features verify correctly on Android.
+- **Coupons to test:** `SAVE10` (10% off), `WELCOME20` (20% off), `FLAT50` (50 off).
+- **Payment:** Credit Card selection simulates a 2-second processing delay.
+- **Notifications:** Ready for testing; use Firebase Console to send test messages.

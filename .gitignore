@@ -1,0 +1,124 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.flutter-plugins
+.pub-cache/
+.pub/
+/build/
+/coverage/
+*.g.dart
+*.config.dart
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/.gradle/
+/android/local.properties
+/android/**/GeneratedPluginRegistrant.java
+
+# iOS/macOS related
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/macos/Pods/
+**/macos/Flutter/Flutter-Release.xcconfig
+
+# Windows related
+/windows/flutter/ephemeral/
+windows/flutter/generated_plugins.cmake
+
+# Linux related
+/linux/flutter/ephemeral/
+linux/flutter/generated_plugins.cmake
+
+# Web related
+/web/packages/
+
+# Firebase
+lib/firebase_options.dart
+google-services.json
+GoogleService-Info.plist
+.firebaserc
+firebase-debug.log
+
+# Environment variables and sensitive files
+.env
+.env.local
+.env.*.local
+*.jks
+*.keystore
+*.pem
+*.key
+
+# Temporary files
+*.swp
+*.swo
+*~
+.#*
+
+# OS specific
+Thumbs.db
+.DS_Store
+*.icloud
+
+# Generated files
+*.pbxproj.bak
+*.gradle.bak
+
+# IDE specific
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# pubspec.lock can be committed based on team preference
+# pubspec.lock
+
+# Documentation and build artifacts
+/doc/
+*.md.backup
+
+# Custom project exclusions
+error.txt
+*.bak
+*.orig
+
+# Node modules (if using web or other tools)
+node_modules/
+npm-debug.log
+yarn-error.log
