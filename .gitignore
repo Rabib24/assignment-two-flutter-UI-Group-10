@@ -75,6 +75,9 @@ GoogleService-Info.plist
 .firebaserc
 firebase-debug.log
 
+# Exception: Allow template file to be committed
+!lib/firebase_options_template.dart
+
 # Environment variables and sensitive files
 .env
 .env.local
