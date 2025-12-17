@@ -69,8 +69,6 @@ linux/flutter/generated_plugins.cmake
 /web/packages/
 
 # Firebase
-lib/firebase_options.dart
-google-services.json
 GoogleService-Info.plist
 .firebaserc
 firebase-debug.log
