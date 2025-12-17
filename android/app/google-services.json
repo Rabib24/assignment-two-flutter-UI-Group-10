@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "125027096524",
+    "project_id": "minimart-77776",
+    "storage_bucket": "minimart-77776.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125027096524:android:94cfe46225743ad4c1ef69",
+        "android_client_info": {
+          "package_name": "com.example.minimart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDj1WIH4D5-6g2uZo5w_bj8iCHTvJaceNY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
