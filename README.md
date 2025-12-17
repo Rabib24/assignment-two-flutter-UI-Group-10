@@ -2,9 +2,34 @@
 
 A full-featured e-commerce mobile application built with Flutter and Firebase.
 
-## Setup Instructions
+## Quick Setup for Faculty
 
-For detailed setup instructions, please refer to [SETUP.md](SETUP.md).
+To run this project quickly:
+
+1. Ensure Flutter is installed on your system
+2. Run the setup script: `setup_project.bat` (Windows) or follow manual steps below
+3. Create a Firebase project and configure `lib/firebase_options.dart`
+4. Run with `flutter run`
+
+## Manual Setup Instructions
+
+1. **Install dependencies**:
+   ```bash
+   flutter pub get
+   ```
+
+2. **Configure Firebase**:
+   - Go to [Firebase Console](https://console.firebase.google.com/)
+   - Create a new project
+   - Register your app (Android, iOS, Web as needed)
+   - Download configuration files
+   - Rename `lib/firebase_options_template.dart` to `lib/firebase_options.dart`
+   - Replace placeholder values with your actual Firebase configuration
+
+3. **Run the application**:
+   ```bash
+   flutter run
+   ```
 
 ## Project Overview
 
@@ -35,4 +60,4 @@ This is a group project (Group 10) for a mobile application development course. 
 
 ## Getting Started
 
-See [SETUP.md](SETUP.md) for detailed installation and configuration instructions.
+See the setup instructions above for detailed installation and configuration.
