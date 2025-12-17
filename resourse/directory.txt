@@ -1,0 +1,103 @@
+# Project Directory Structure & File Analysis - MiniMart
+
+## � Root Level
+| File/Directory | Purpose |
+| :--- | :--- |
+| **`lib/`** | Contains all the Dart code for the application. |
+| **`assets/`** | Stores static resources (Images, Icons). |
+| **`test/`** | Contains Unit and Widget tests. |
+| **`resourse/`** | Project documentation, planning files, and logs. |
+| **`pubspec.yaml`** | Manages dependencies, assets, and app versioning. |
+| **`firebase_options.dart`** | Auto-generated configuration for connecting to Firebase projects. |
+| **`firestore.rules`** | Security rules deployed to Cloud Firestore. |
+| **`analysis_options.yaml`** | Linter rules for Dart code quality. |
+
+---
+
+## 📂 lib (Application Logic)
+
+### 🔐 lib/auth (Authentication Module)
+| File | Description |
+| :--- | :--- |
+| **`login_screen.dart`** | UI for user sign-in. Handles email/password inputs and error states. |
+| **`signup_screen.dart`** | UI for registration. Triggers finding account creation and email verification. |
+| **`forgot_password_screen.dart`** | UI to trigger password reset emails via Firebase. |
+
+### 🧩 lib/providers (State Management - ViewModel)
+| File | Description |
+| :--- | :--- |
+| **`auth_provider.dart`** | Manages User Session (`FirebaseAuth`), Sign In/Up logic, and User Profile fetching. |
+| **`products_provider.dart`** | Fetches products from Firestore, handles Admin CRUD (Add/Delete), and Search/Sort logic. |
+| **`cart_provider.dart`** | Manages Cart state (Add/Remove items), calculates Totals, and handles Coupon validation. |
+| **`orders_provider.dart`** | Handles Order placement (writing to Firestore) and fetching Order History. |
+| **`wishlist_provider.dart`** | Manages the list of favorite products (`users/{uid}/wishlist`). |
+| **`theme_provider.dart`** | Manages the global Light/Dark theme state using `SharedPreferences`. |
+
+### 📱 lib/screens (UI Pages)
+| File | Description |
+| :--- | :--- |
+| **`main_screen.dart`** | The "Home" wrapper. Handles Bottom Navigation and app layout structure. |
+| **`shop_page.dart`** | The main Dashboard. Displays Product Grid, Search Bar, Category Filter, and Sorting. |
+| **`product_details_page.dart`** | Single product view. Shows large image, description, and "Add to Cart" FAB. |
+| **`cart_page.dart`** | Displays added items with quantity controls. Proceed to checkout. |
+| **`checkout_page.dart`** | Form for Shipping Info. Coupon input. Payment Method selection. "Place Order" button. |
+| **`order_confirmation_page.dart`** | Success screen shown after placing an order with order details. |
+| **`order_details_page.dart`** | Expanded view of a single order showing all items and transaction details. |
+| **`orders_page.dart`** | List of past orders. Expandable tiles show order contents with view details button. |
+| **`wishlist_page.dart`** | Grid view of "Hearted" items with remove and add-to-cart options. |
+| **`profile_page.dart`** | User Settings. Dark Mode toggle. Edit Profile. Link to **Admin Panel**. |
+| **`settings_page.dart`** | Application settings and preferences including theme, notifications, and privacy. |
+| **`admin_page.dart`** | Admin Dashboard. Add/Edit/Delete products from the global catalog. Dynamic category management. |
+| **`category_products_page.dart`** | Filtered view showing products of a specific category. |
+
+### 🧱 lib/widgets (Reusable Components)
+| File | Description |
+| :--- | :--- |
+| **`product_grid_item.dart`** | The individual card in the grid (Image + Title + Price + Heart Icon for Wishlist). |
+| **`cart_item_widget.dart`** | The list tile used in Cart Page with Qty +/- controls and remove button. |
+| **`order_item_widget.dart`** | The expandable tile used in Orders Page showing order summary. |
+| **`app_drawer.dart`** | Side menu (Hamburger) for navigation to all major screens. |
+| **`custom_bottom_nav_bar.dart`** | Bottom navigation bar widget with Shop, Cart, Orders, and Profile tabs. |
+| **`app_bar.dart`** | Custom App Bar widget with search functionality and cart badge. |
+| **`snackbar.dart`** | Helper for showing standardized error/success messages with styling. |
+| **`splash_screen.dart`** | The initial loading screen shown while Firebase initializes. |
+| **`location_select.dart`** | Widget for selecting delivery location from predefined addresses. |
+| **`product_reviews.dart`** | Widget for displaying and creating product reviews (empty placeholder). |
+
+### � lib/models (Data Transfers)
+| File | Description |
+| :--- | :--- |
+| **`product.dart`** | Defines `id`, `title`, `price`, `description`, `imageUrl`, `category`. |
+| **`coupon.dart`** | Defines `code`, `discountValue`, `discountType`, `expiryDate`. |
+
+
+### ⚙️ lib/services (Background Logic)
+| File | Description |
+| :--- | :--- |
+| **`seeder_service.dart`** | Auto-injects demo data (Coupons/Products) if the database is empty on app startup. |
+| **`image_cache_service.dart`** | Utilities for optimized image loading and caching performance. |
+
+---
+
+## 📂 resourse (Documentation & Planning)
+| File | Description |
+| :--- | :--- |
+| **`Project_Summary_and_Manual.txt`** | **Primary Document.** 5000+ words. Comprehensive operational and technical manual. |
+| **`Project_Contributions.txt`** | Detailed breakdown of work by Member 1, Member 2, and Member 3. |
+| **`Member2_Contributions.txt`** | Comprehensive record of Member 2's Phase 1-3 enhancements. |
+| **`IMPLEMENTATION_DETAILS.txt`** | Technical deep dive into admin panel and product management implementation. |
+| **`PROJECT_COMPLIANCE_REPORT.txt`** | Verification of P004 requirements and restrictions compliance status. |
+| **`DOCUMENTATION_INDEX.txt`** | Navigation guide for all project documentation files. |
+| **`LATEST_UPDATES_CHANGELOG.txt`** | Recent changes, bug fixes, and feature enhancements log. |
+| **`Documentation_Plan.txt`** | Strategy used to expand the documentation. |
+| **`Task_File_Mapping.txt`** | Map of features to specific files and technical implementation details. |
+| **`UPDATE_SUMMARY.txt`** | Summary of latest project updates and modifications. |
+| **`Documentation_Viewer.html`** | Interactive HTML viewer for browsing project documentation. |
+| **`Extra.txt`** | List of value-added features beyond basic requirements. |
+| **`GithubManagement.txt`** | Git setup and version control instructions. |
+
+## 📂 test (Quality Assurance)
+| File | Description |
+| :--- | :--- |
+| **`full_app_test.dart`** | Integration tests confirming Widget Tree build and Provider injection. |
+| **`demoData/demo_seeder.dart`** | Script used during testing to inject mock data. |

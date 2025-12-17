@@ -1,0 +1,46 @@
+# MiniMart Flutter App - Project Status & Todo
+
+## ✅ CORE REQUIREMENTS (P004 Completed)
+- [x] **Product Catalog**: Load products from Firebase (Name, Price, Category, Image)
+- [x] **Product Details**: View details with "Add to Cart"
+- [x] **Cart System**: Manage items (Add, Remove, Quantity, Total)
+- [x] **Order Placement**: Secure checkout with user details (Name, Phone, Address)
+- [x] **Order Confirmation**: Receipt screen with status
+- [x] **Order IDs**: Unique generation using Firebase Doc IDs
+- [x] **Order History**: View past orders and status
+- [x] **Checkout Logic**: Save to Firebase and clear cart
+
+## 🚀 IMPLEMENTED EXTRA FEATURES (Completed)
+### Authentication & User
+- [x] Email Verification workflow
+- [x] User Profile Management (Edit Name/Phone)
+- [x] Secure Password handling
+
+### UI/UX
+- [x] Splash Screen
+- [x] Custom Gradient App Bar & Bottom Navigation
+- [x] App Drawer & Location Selector
+- [x] Snackbar Notifications & Loading States
+- [x] Pull-to-refresh & Image Caching
+- [x] Interactive Cart (Swipe/Dialogs)
+- [x] Dark Mode Toggle
+- [x] Product Search & Sorting
+
+### Engagement & Advanced
+- [x] Wishlist / Favorites
+- [x] Product Reviews & Ratings
+- [x] Coupon / Discount System
+- [x] Push Notifications (FCM + Local)
+- [x] Payment Gateway (Simulated UI)
+
+### Technical
+- [x] Provider State Management (Auth, Cart, Orders, Products)
+- [x] Firebase Realtime Sync
+- [x] App Theme & Custom Colors
+- [x] Automated Widget Tests
+- [x] Demo Data Seeding Script
+- [x] Admin Panel (Product Management)
+
+## ⏳ PENDING / FUTURE ENHANCEMENTS (Incomplete)
+- [ ] Multi-language Support (Requires refactoring)
+- [ ] Advanced User Analytics

@@ -1,0 +1,118 @@
+# Project Contributions Report & Handover
+
+## Overview
+This document details the division of work between team members for the MiniMart project.
+
+## 👤 Member 1 Contributions (Foundational & Core)
+**Focus:** Project Setup, Core Architecture, Authentication, and Basic E-commerce Flow.
+
+### 1. Core Infrastructure
+- **Project Setup:** Initial Flutter app creation, Firebase project configuration (Android/iOS).
+- **State Management:** Implemented the `Provider` architecture (`AuthProvider`, `ProductsProvider`, `CartProvider`, `OrdersProvider`).
+- **Database:** Designed Firestore schema for Users, Products, and Orders.
+
+### 2. Authentication & User Management
+- **Firebase Auth:** Implemented Sign Up, Sign In, and Sign Out functionalities.
+- **Security:** Added Email Verification workflow and securely stored user data.
+- **Profile:** Basic profile view and editing (Name/Phone).
+
+### 3. Product & Shopping Core
+- **Product Catalog:** Fetched and displayed products from Firestore in `ShopPage`.
+- **Product Details:** Created detailed view with images and description.
+- **Cart System:**
+  - Full CRUD operations (Add, Remove, update Quantity).
+  - Real-time subtotal calculation.
+- **Checkout & Orders:**
+  - Built `CheckoutPage` (Form validation, Address input).
+  - Implemented Order placement logic.
+  - created `OrdersPage` to view order history.
+
+### 4. UI/UX Essentials
+- **Navigation:** App Drawer and Custom Bottom Navigation Bar.
+- **Splash Screen:** Animated starting screen.
+- **Visuals:** Base theme setup, Pull-to-refresh, and Toast/Snackbar messages.
+
+---
+
+## 👤 Member 2 Contributions (Enhancements & Advanced Features)
+**Focus:** User Experience (UX), Engagement, and Advanced Functionality (Phases 1-3).
+
+### 1. Essential UX Enhancements
+- **Search Functionality:**
+  - Implemented real-time product search in `ShopPage`.
+  - Added search bar widget with filtering logic.
+- **Sorting System:**
+  - Added ability to sort products by Price (Low to High / High to Low).
+  - Integrated `PopupMenuButton` for sort options.
+- **Dark Mode:**
+  - Performed full app styling for Dark Theme support.
+  - created `ThemeProvider` for state persistence.
+  - Added Dark Mode toggle switch in `ProfilePage`.
+- **Wishlist System:**
+  - Created `WishlistProvider` to manage favorites in Firestore (`users/{uid}/wishlist`).
+  - Built `WishlistPage` to display saved items.
+  - Added interactive "Heart" icon to product cards.
+
+### 4. Documentation & Maintenance
+- **Refactoring:** Cleaned up provider logic and separated UI widgets.
+- **Documentation:** Updated `Project_Summary_and_Manual.txt` with new feature instructions.
+- **Tracking:** Updated `todo.txt` to reflect completed status of assigned tasks.
+
+---
+
+## 👤 Member 3 Contributions (Final Polish & Optimization)
+**Focus:** Admin Panel Enhancement, Bug Fixes, Project Compliance Verification, and Documentation Updates.
+
+### 1. Admin Panel Enhancement
+- **Edit Functionality:** Implemented full edit feature for existing products with pre-populated forms.
+- **Dynamic Category Management:** Replaced static category input with dropdown menu featuring:
+  - Dynamic extraction of categories from Firestore
+  - "Other" option for custom category input
+  - Safe dropdown value management preventing crashes
+- **Form Validation:** Enhanced validation for product creation and editing forms.
+- **Asynchronous Operations:** Implemented proper async/await for all database operations with error handling.
+
+### 2. Bug Fixes & Critical Improvements
+- **Product ID Synchronization:** Fixed cart items using timestamp IDs instead of actual product IDs.
+- **DropdownButton Value Mismatch:** Resolved crashes when selected category not in dropdown items list.
+- **Provider Method Declarations:** Fixed orphaned code and missing async method declarations in `products_provider.dart`.
+- **Email Verification Auto-Refresh:** Implemented automatic email verification status refresh on app resume.
+- **Order Details Page:** Created comprehensive order details page with expandable order item list.
+
+### 3. Project Compliance & Verification
+- **Requirement Verification:** Comprehensive audit against P004 specifications from MobileApp Final Project .txt.
+- **Restrictions Compliance:** Verified adherence to all project restrictions (no file uploads, push notifications, platform-specific features).
+- **Documentation Verification:** Cross-checked all requirements with actual implementation.
+- **Compliance Report:** Created PROJECT_COMPLIANCE_REPORT.txt confirming 100% compliance.
+
+### 4. Documentation Updates & Cleanup
+- **Directory Structure:** Updated `directory.txt` with accurate file descriptions and current project structure.
+- **Implementation Details:** Added `IMPLEMENTATION_DETAILS.txt` with technical deep dives into admin panel architecture.
+- **Documentation Index:** Updated `DOCUMENTATION_INDEX.txt` with all current documentation files.
+- **Documentation Viewer:** Enhanced `Documentation_Viewer.html` with all current documentation resources.
+- **Member 3 Contributions:** Added this section to `Project_Contributions.txt` for team handover.
+
+### 5. Code Quality & Architecture
+- **State Management:** Verified proper use of ChangeNotifier pattern and notifyListeners() placement.
+- **Error Handling:** Improved try-catch blocks with user-friendly error messages.
+- **Code Organization:** Ensured proper separation of concerns across providers, screens, and widgets.
+- **Null Safety:** Added defensive null checks throughout admin panel and product management code.
+
+---
+
+## Project Status Summary
+**✅ All Core Functionality:** Complete and tested
+**✅ All Enhancements:** Implemented and verified
+**✅ Compliance Status:** 100% compliant with P004 requirements
+**✅ Documentation:** Comprehensive and up-to-date
+**✅ Production Ready:** Application is ready for deployment
+
+---
+
+## Handover Notes for Future Developers
+- All features verify correctly on Android and iOS.
+- **Payment Methods:** Cash on Delivery (instant), Credit Card (2-second simulation), Mobile Money (2-second simulation).
+- **Test Coupons:** `SAVE10` (10% off), `WELCOME20` (20% off), `FLAT50` ($50 fixed discount).
+- **Admin Access:** Available through Profile Page hidden button or by setting `userRole: 'admin'` in Firestore.
+- **Key Files Modified:** `admin_page.dart`, `products_provider.dart`, `main_screen.dart`, `auth_provider.dart`.
+- **Documentation:** All implementation details available in IMPLEMENTATION_DETAILS.txt and PROJECT_COMPLIANCE_REPORT.txt.

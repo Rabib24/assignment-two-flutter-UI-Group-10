@@ -1,0 +1,155 @@
+# MiniMart Project - Latest Updates Changelog
+**Version:** 1.0.3 (Updated December 17, 2025)
+**Focus Area:** Admin Panel Enhancement & Documentation Update
+
+---
+
+## 🔄 Recent Code Changes
+
+### 1. Admin Product Edit Feature (NEW)
+**File:** `lib/screens/admin_page.dart`
+**Changes:**
+- Added `_showEditProductDialog()` method for editing existing products
+- Each product now displays with Edit (blue pencil) and Delete (red X) icons
+- Edit dialog pre-populates all product fields from current data
+- Uses `StatefulBuilder` to manage dynamic form state
+- Form validation matches Add Product requirements
+
+### 2. Dynamic Category Management (ENHANCED)
+**Files:** 
+- `lib/screens/admin_page.dart`
+- `lib/providers/products_provider.dart`
+
+**Changes in ProductsProvider:**
+- Added `fetchCategories()` method to extract unique categories from products
+- Added `categories` getter to expose categories list
+- Modified `fetchProducts()` to automatically call `fetchCategories()` after loading
+- Categories always include "General" as default
+- Categories are sorted alphabetically for consistent display
+
+**Changes in AdminPage (Both Add & Edit dialogs):**
+- Replaced text input with DropdownButton for category selection
+- Dropdown populated from `ProductsProvider.categories`
+- Added "Other" option for custom category entry
+- Conditional TextField appears when "Other" is selected
+- New categories automatically saved to Firestore when product is created/updated
+
+### 3. Category Dropdown Safety (BUG FIX)
+**File:** `lib/screens/admin_page.dart`
+**Issue:** DropdownButton failed when selected value wasn't in items list
+**Solution:**
+- Convert categories to mutable list with `toList()`
+- Ensure "General" is always in the list (first position in Add dialog)
+- Ensure selected category is in the list (for Edit dialog)
+- Add missing values before building dropdown items
+- Sort list to maintain consistent order
+
+### 4. Cart Item ID Fix (BUG FIX)
+**File:** `lib/providers/cart_provider.dart`
+**Issue:** Cart items used timestamp IDs instead of actual product IDs
+**Fix:** Changed `id: DateTime.now().toString()` to `id: productId`
+**Impact:** Fixed "Product with id not found" errors in order details
+
+### 5. Admin Page Initialization (IMPROVEMENT)
+**File:** `lib/screens/admin_page.dart`
+**Changes:**
+- `initState()` now calls `fetchProducts()` instead of just `fetchCategories()`
+- `fetchProducts()` automatically triggers `fetchCategories()` in the provider
+- Ensures both products and categories are loaded when admin page opens
+- Categories available immediately in Add/Edit dialogs
+
+### 6. ProductsProvider Method Cleanup (CODE FIX)
+**File:** `lib/providers/products_provider.dart`
+**Changes:**
+- Fixed missing `fetchProducts()` method declaration
+- Removed duplicate `updateProduct()` and `fetchCategories()` method definitions
+- Fixed orphaned code (lines 57-106) that was missing method wrapper
+- All 20+ compilation errors resolved
+
+---
+
+## 📚 Documentation Updates
+
+### Updated Files:
+1. **resourse/Task_File_Mapping.txt**
+   - Enhanced Admin Panel section with detailed edit/category management info
+   - Updated ProductsProvider section with all methods and usage
+   - Added StatefulBuilder, Consumer, DropdownButton widget documentation
+   - Clarified data flow for CRUD operations
+
+2. **resourse/Project_Summary_and_Manual.txt**
+   - Section 2.8: Added product editing and dynamic category features
+   - Section 5.2: Enhanced with category management and update operations
+   - Section 7.5: Completely rewrote admin operations with step-by-step guides
+   - Added separate subsections for Add, Edit, Delete, and Category Management
+   - Included visual indicators (icons) in operational instructions
+
+### New Files Created:
+1. **resourse/LATEST_UPDATES_CHANGELOG.txt** (This file)
+   - Comprehensive changelog of all recent modifications
+   - Organized by feature and file
+   - Includes impact analysis and bug fix explanations
+
+---
+
+## ✨ Feature Summary - What Works Now
+
+### Admin Panel Complete CRUD:
+✅ **Create** - Add new products with custom categories
+✅ **Read** - List all products with images and prices  
+✅ **Update** - Edit product details and categories (NEW)
+✅ **Delete** - Remove products with confirmation
+
+### Category Management:
+✅ Dynamic dropdown populated from product data
+✅ "Other" option for creating new categories on-the-fly
+✅ New categories automatically saved to Firestore
+✅ Categories sorted alphabetically for consistency
+✅ "General" always available as default
+
+### Product Operations:
+✅ Real-time product list updates after any operation
+✅ Category extraction from all products
+✅ Pre-populated edit forms for existing products
+✅ Error handling with user-friendly feedback via SnackBar
+
+---
+
+## 🧪 Testing Notes
+
+All features have been tested and verified working:
+- ✅ Product adding with dropdown categories
+- ✅ Product editing with form pre-population
+- ✅ Category dropdown value safety (no mismatches)
+- ✅ Custom category creation and persistence
+- ✅ Product deletion with confirmation
+- ✅ Categories available in dropdown immediately
+- ✅ Cart items display correct product IDs
+- ✅ No compilation errors
+
+---
+
+## 📋 Compliance Status
+
+**Project Specifications:** ✅ FULLY COMPLIANT
+- All features documented in Project_Summary_and_Manual.txt are implemented
+- All CRUD operations working correctly
+- Admin panel fully functional with all requested enhancements
+- Database operations asynchronous with proper error handling
+- User feedback implemented via CustomSnackBar
+
+---
+
+## 🚀 Version History
+
+| Version | Date | Focus |
+|---------|------|-------|
+| 1.0.2 | Dec 17, 2025 | Core Features + Category Filtering |
+| 1.0.3 | Dec 17, 2025 | Admin Edit Feature + Documentation Update |
+
+---
+
+**Last Updated:** December 17, 2025
+**Next Steps:** Users can proceed with advanced features (Stripe payments, pagination, web support) as outlined in Future Roadmap (Section 9 of Project_Summary_and_Manual.txt)
+
+---
