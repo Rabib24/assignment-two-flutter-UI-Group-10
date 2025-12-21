@@ -56,20 +56,15 @@ class _SplashScreenState extends State<SplashScreen>
     await _controller.forward();
     await Future.delayed(const Duration(milliseconds: 800));
     if (mounted) {
-      final authProvider = Provider.of<AuthManager>(context, listen: false); // Changed from AuthProvider to AuthManager
-      final Widget destination = authProvider.user != null
-          ? const MainScreen()
-          : const LoginScreen();
-
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) => destination,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 600),
-        ),
-      );
+      final authProvider = Provider.of<AuthManager>(
+        context,
+        listen: false,
+      ); // Changed from AuthProvider to AuthManager
+      if (authProvider.user != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
     }
   }
 

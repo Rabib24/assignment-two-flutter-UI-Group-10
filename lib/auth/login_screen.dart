@@ -42,7 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 const Text(
                   "Sign in to continue your shopping journey",
-                  style: TextStyle(fontSize: 16, color: AppColors.textSecondary),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 40),
 
@@ -168,7 +171,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             height: 20,
                             width: 20,
                             child: CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
                               strokeWidth: 2,
                             ),
                           )
@@ -227,30 +232,35 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     try {
-      await Provider.of<AuthManager>(context, listen: false).signIn(email, password);
+      await Provider.of<AuthManager>(
+        context,
+        listen: false,
+      ).signIn(email, password);
+
+      // Navigate to MainScreen after successful login
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
     } catch (e) {
       if (context.mounted) {
         setState(() {
           _isLoading = false;
         });
-        
+
         final errorMessage = e.toString();
-        
+
         // Check if the error is about email verification
         if (errorMessage.contains('Email not verified')) {
           _showVerificationDialog(email, password);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMessage),
-              backgroundColor: Colors.red,
-            ),
+            SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
           );
         }
       }
     }
   }
-  
+
   void _showVerificationDialog(String email, String password) {
     showDialog(
       context: context,
@@ -279,21 +289,23 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-  
+
   Future<void> _resendVerificationEmail(String email, String password) async {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
-      await Provider.of<AuthManager>(context, listen: false)
-          .resendVerificationEmail(email, password);
-      
+      await Provider.of<AuthManager>(
+        context,
+        listen: false,
+      ).resendVerificationEmail(email, password);
+
       if (context.mounted) {
         setState(() {
           _isLoading = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
@@ -309,12 +321,9 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() {
           _isLoading = false;
         });
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
         );
       }
     }

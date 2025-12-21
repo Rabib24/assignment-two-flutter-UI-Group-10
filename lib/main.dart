@@ -15,6 +15,7 @@ import 'package:minimart/screens/wishlist_page.dart';
 import 'package:minimart/screens/orders_page.dart';
 import 'package:minimart/screens/profile_page.dart';
 import 'package:minimart/screens/settings_page.dart';
+import 'package:minimart/screens/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:minimart/firebase_options.dart';
 import 'package:minimart/theme/app_theme.dart';
@@ -27,11 +28,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase only if it hasn't been initialized already
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-    
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
     // Configure Firebase Auth settings for web
     if (kIsWeb) {
       // For web, we need to configure reCAPTCHA
@@ -39,7 +42,7 @@ void main() async {
         appVerificationDisabledForTesting: false,
       );
     }
-    
+
     // Seed coupons and products on first run
     await SeederService.seedCoupons();
     await SeederService.seedProducts();
@@ -48,9 +51,6 @@ void main() async {
       rethrow;
     }
   }
-
-  // No storage permissions needed - using only Unsplash URLs (no file uploads)
-  // This complies with project restrictions
 
   runApp(const MyApp());
 }
@@ -63,7 +63,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create: (_) => AuthManager()), // Updated to use AuthManager
+        ChangeNotifierProvider(
+          create: (_) => AuthManager(),
+        ), // Updated to use AuthManager
         ChangeNotifierProvider(create: (_) => OrdersProvider()),
         ChangeNotifierProvider(create: (_) => ProductsProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
@@ -77,8 +79,10 @@ class MyApp extends StatelessWidget {
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
-            home: const SplashScreen(),
+            initialRoute: '/',
             routes: {
+              '/': (context) => const SplashScreen(),
+              '/home': (context) => const MainScreen(),
               '/login': (context) => const LoginScreen(),
               '/signup': (context) => const SignupScreen(),
               '/forgot-password': (context) => const ForgotPasswordScreen(),
@@ -92,11 +96,8 @@ class MyApp extends StatelessWidget {
             // Handle unknown routes
             onUnknownRoute: (settings) {
               return MaterialPageRoute(
-                builder: (context) => const Scaffold(
-                  body: Center(
-                    child: Text('Page not found'),
-                  ),
-                ),
+                builder: (context) =>
+                    const Scaffold(body: Center(child: Text('Page not found'))),
               );
             },
           );
